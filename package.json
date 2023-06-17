@@ -1,8 +1,10 @@
 {
-  "name": "anchor-client-gen",
+  "name": "@dcaf/anchor-client-gen",
   "description": "A tool for generating solana web3 clients from anchor IDLs.",
   "version": "0.28.1",
-  "bin": "dist/main.js",
+  "bin": {
+    "anchor-client-gen": "dist/main.js"
+  },
   "license": "MIT",
   "homepage": "https://github.com/dcaf-labs/anchor-client-gen",
   "type": "module",
@@ -57,5 +59,24 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "main": "dist/main.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcaf-labs/anchor-client-gen.git"
+  },
+  "keywords": [
+    "anchor",
+    "solana",
+    "anchor-client",
+    "anchor-code-gen"
+  ],
+  "author": "Dcaf Labs",
+  "bugs": {
+    "url": "https://github.com/dcaf-labs/anchor-client-gen/issues"
+  }
 }

@@ -1,8 +1,9 @@
-# anchor-client-gen
+# @dcaf/anchor-client-gen
 
-[![npm](https://img.shields.io/npm/v/anchor-client-gen/latest.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/anchor-client-gen/v/latest)
-[![npm](https://img.shields.io/npm/v/anchor-client-gen/beta.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/anchor-client-gen/v/beta)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dcaf-labs/anchor-client-gen/Tests?label=build&style=flat-square)](https://github.com/dcaf-labs/anchor-client-gen/actions/workflows/tests.yaml?query=branch%3Amaster)
+[![npm](https://img.shields.io/npm/v/@dcaf/anchor-client-gen/latest.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/@dcaf/anchor-client-gen/v/latest)
+[![npm](https://img.shields.io/npm/v/@dcaf/anchor-client-gen/beta.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/@dcaf/anchor-client-gen/v/beta)
+
+<!-- [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dcaf-labs/@dcaf/anchor-client-gen/Tests?label=build&style=flat-square)](https://github.com/dcaf-labs/@dcaf/anchor-client-gen/actions/workflows/tests.yaml?query=branch%3Amaster) -->
 
 Generate typescript solana web3 clients from [anchor](https://github.com/coral-xyz/anchor) IDLs.
 
@@ -10,13 +11,13 @@ Generate typescript solana web3 clients from [anchor](https://github.com/coral-x
 
 ```sh
 # npm
-$ npm install --global anchor-client-gen
+$ npm install --global @dcaf/anchor-client-gen
 
 # yarn
-$ yarn global add anchor-client-gen
+$ yarn global add @dcaf/anchor-client-gen
 ```
 
-To get the beta build which has unreleased features, install with `anchor-client-gen@beta`.
+To get the beta build which has unreleased features, install with `@dcaf/anchor-client-gen@beta`.
 
 ## Usage
 
@@ -38,7 +39,7 @@ Options:
 ## Example
 
 ```sh
-$ anchor-client-gen path/to/idl.json output/directory
+$ @dcaf/anchor-client-gen path/to/idl.json output/directory
 ```
 
 This will generate code to `output/directory`:
@@ -63,7 +64,7 @@ This will generate code to `output/directory`:
 └── programId.ts
 ```
 
-For more examples of the generated code, check out the [examples](https://github.com/dcaf-labs/anchor-client-gen/tree/master/examples) directory.
+For more examples of the generated code, check out the [examples](https://github.com/dcaf-labs/@dcaf/anchor-client-gen/tree/master/examples) directory.
 
 ## Using the generated client
 
