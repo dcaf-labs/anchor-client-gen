@@ -4,13 +4,13 @@ Latest:
 
 - Change `@coral-xyz/anchor` and `@coral-xyz/anchor-cli` versions in `package.json` to official npm packages and match the release version
 - Change the `anchor-lang` dependency version in `tests/example-program/programs/example-program/Cargo.toml` to match the release version
-- Bump the version outputted by `--version` flag in `src/main.ts`
+- Bump the version outputted by `--version` flag in `src/main.ts` and `package.json`.
 - Bump the package version in `package.json`
 - Run `yarn build` and `yarn test`
 - Update CHANGELOG.md with the new version
 - Commit the changes to git
-- Publish the latest version `npm publish`
-- Tag the beta with the new version `npm dist-tag add anchor-client-gen@vX.Y.Z beta`
+- Publish the latest version `yarn publish`
+- Tag the beta with the new version `npm dist-tag add @dcaf/anchor-client-gen@vX.Y.Z beta`
 - Tag the commit on master after merging with `git tag <version>`
 
 Beta:
@@ -19,5 +19,5 @@ Beta:
 - Update the version outputted by `--version` flag in `src/main.ts` to match the above
 - Run `yarn build` and `yarn test`
 - Commit the changes to git
-- Publish the beta version `npm publish --tag beta` (optionally do a dry run with `--dry-run`)
+- Publish the beta version `yarn publish --tag beta` (optionally do a dry run with `--dry-run`)
 - Tag the commit on master after merging with `git tag <version>`
