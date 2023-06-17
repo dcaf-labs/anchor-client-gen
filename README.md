@@ -39,7 +39,7 @@ Options:
 ## Example
 
 ```sh
-$ @dcaf/anchor-client-gen path/to/idl.json output/directory
+$ anchor-client-gen path/to/idl.json output/directory
 ```
 
 This will generate code to `output/directory`:
