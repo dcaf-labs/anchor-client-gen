@@ -1,11 +1,10 @@
 import { PublicKey, Connection } from "@solana/web3.js"
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
 export interface State2Fields {
-  vecOfOption: Array<BN | null>
+  vecOfOption: Array<bigint | null>
 }
 
 export interface State2JSON {
@@ -13,7 +12,7 @@ export interface State2JSON {
 }
 
 export class State2 {
-  readonly vecOfOption: Array<BN | null>
+  readonly vecOfOption: Array<bigint | null>
 
   static readonly discriminator = Buffer.from([
     106, 97, 255, 161, 250, 205, 185, 192,
@@ -86,7 +85,7 @@ export class State2 {
   static fromJSON(obj: State2JSON): State2 {
     return new State2({
       vecOfOption: obj.vecOfOption.map(
-        (item) => (item && new BN(item)) || null
+        (item) => (item && BigInt(item)) || null
       ),
     })
   }

@@ -13,15 +13,15 @@ export interface InitializeWithValuesArgs {
   u32Field: number
   i32Field: number
   f32Field: number
-  u64Field: BN
-  i64Field: BN
+  u64Field: bigint
+  i64Field: bigint
   f64Field: number
-  u128Field: BN
-  i128Field: BN
+  u128Field: bigint
+  i128Field: bigint
   bytesField: Uint8Array
   stringField: string
   pubkeyField: PublicKey
-  vecField: Array<BN>
+  vecField: Array<bigint>
   vecStructField: Array<types.FooStructFields>
   optionField: boolean | null
   optionStructField: types.FooStructFields | null
@@ -99,11 +99,11 @@ export function initializeWithValues(
       u32Field: args.u32Field,
       i32Field: args.i32Field,
       f32Field: args.f32Field,
-      u64Field: args.u64Field,
-      i64Field: args.i64Field,
+      u64Field: new BN(args.u64Field),
+      i64Field: new BN(args.i64Field),
       f64Field: args.f64Field,
-      u128Field: args.u128Field,
-      i128Field: args.i128Field,
+      u128Field: new BN(args.u128Field),
+      i128Field: new BN(args.i128Field),
       bytesField: Buffer.from(
         args.bytesField.buffer,
         args.bytesField.byteOffset,
@@ -111,7 +111,7 @@ export function initializeWithValues(
       ),
       stringField: args.stringField,
       pubkeyField: args.pubkeyField,
-      vecField: args.vecField,
+      vecField: args.vecField.map((item) => new BN(item)),
       vecStructField: args.vecStructField.map((item) =>
         types.FooStruct.toEncodable(item)
       ),
