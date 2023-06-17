@@ -4,7 +4,7 @@
   "version": "0.28.0",
   "bin": "dist/main.js",
   "license": "MIT",
-  "homepage": "https://github.com/kklas/anchor-client-gen",
+  "homepage": "https://github.com/dcaf-labs/anchor-client-gen",
   "type": "module",
   "scripts": {
     "watch": "tsc --project tsconfig.build.json --watch",
