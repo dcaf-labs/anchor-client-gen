@@ -252,7 +252,7 @@ export function fieldToEncodable(
     case "i128":
     case "u256":
     case "i256":
-      return `new BN(${valPrefix}${ty.name})`
+      return `new BN(${valPrefix}${ty.name}.toString())`
     case "bytes": {
       const v = `${valPrefix}${ty.name}`
       return `Buffer.from(${v}.buffer, ${v}.byteOffset, ${v}.length)`
