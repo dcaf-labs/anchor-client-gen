@@ -14,7 +14,6 @@ Latest:
 
 Beta:
 
-- Update package.json to a beta version (e.g. `0.24.0-beta.1`)
 - Update the version outputted by `--version` flag in `src/main.ts` to match the above
 - Run `yarn build` and `yarn test`
 - Publish the beta version `yarn publish --tag beta` (optionally do a dry run with `--dry-run`)
