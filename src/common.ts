@@ -65,18 +65,15 @@ export function tsTypeFromIdl(
     case "u32":
     case "i32":
     case "f32":
+    case "f64":
       return "number"
     case "u64":
     case "i64":
-      return "BN"
-    case "f64":
-      return "number"
     case "u128":
     case "i128":
-      return "BN"
     case "u256":
     case "i256":
-      return "BN"
+      return "bigint"
     case "bytes":
       return "Uint8Array"
     case "string":
@@ -245,16 +242,17 @@ export function fieldToEncodable(
     case "u32":
     case "i32":
     case "f32":
+    case "f64":
+    case "string":
+    case "publicKey":
+      return `${valPrefix}${ty.name}`
     case "u64":
     case "i64":
-    case "f64":
     case "u128":
     case "i128":
     case "u256":
     case "i256":
-    case "string":
-    case "publicKey":
-      return `${valPrefix}${ty.name}`
+      return `new BN(${valPrefix}${ty.name})`
     case "bytes": {
       const v = `${valPrefix}${ty.name}`
       return `Buffer.from(${v}.buffer, ${v}.byteOffset, ${v}.length)`
@@ -708,7 +706,7 @@ export function fieldFromJSON(
     case "i64":
     case "u128":
     case "i128":
-      return `new BN(${paramPrefix}${ty.name})`
+      return `BigInt(${paramPrefix}${ty.name})`
     case "u256":
     case "i256":
     case "publicKey":

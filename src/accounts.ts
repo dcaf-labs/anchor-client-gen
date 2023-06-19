@@ -65,7 +65,6 @@ function genAccountFiles(
     // imports
     src.addStatements([
       `import { PublicKey, Connection } from "@solana/web3.js"`,
-      `import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars`,
       `import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars`,
       ...(idl.types && idl.types.length > 0
         ? [
@@ -180,8 +179,8 @@ function genAccountFiles(
         {
           name: "programId",
           type: "PublicKey",
-          initializer: "PROGRAM_ID"
-        }
+          initializer: "PROGRAM_ID",
+        },
       ],
       returnType: `Promise<${name} | null>`,
       statements: [
@@ -221,8 +220,8 @@ function genAccountFiles(
         {
           name: "programId",
           type: "PublicKey",
-          initializer: "PROGRAM_ID"
-        }
+          initializer: "PROGRAM_ID",
+        },
       ],
       returnType: `Promise<Array<${name} | null>>`,
       statements: [
