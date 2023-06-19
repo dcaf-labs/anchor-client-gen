@@ -34,7 +34,9 @@ function genIndexFile(
   const src = project.createSourceFile(outPath("accounts/index.ts"), "", {
     overwrite: true,
   })
-
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   idl.accounts?.forEach((ix) => {
     src.addExportDeclaration({
       namedExports: [ix.name],
@@ -61,7 +63,9 @@ function genAccountFiles(
         overwrite: true,
       }
     )
-
+    src.addStatements([
+      `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+    ])
     // imports
     src.addStatements([
       `import { PublicKey, Connection } from "@solana/web3.js"`,

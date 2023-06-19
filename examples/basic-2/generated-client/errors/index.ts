@@ -1,3 +1,4 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey } from "@solana/web3.js"
 import { PROGRAM_ID } from "../programId"
 import * as anchor from "./anchor"

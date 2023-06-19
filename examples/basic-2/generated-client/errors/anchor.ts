@@ -1,3 +1,4 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 export type AnchorError =
   | InstructionMissing
   | InstructionFallbackNotFound

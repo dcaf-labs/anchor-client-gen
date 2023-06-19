@@ -26,6 +26,9 @@ export function genIndex(
   })
 
   const hasCustomErrors = idl.errors && idl.errors.length > 0
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   src.addStatements([`import { PublicKey } from "@solana/web3.js"`])
   src.addImportDeclaration({
     namedImports: ["PROGRAM_ID"],
@@ -171,7 +174,9 @@ export function genCustomErrors(
   const src = project.createSourceFile(outPath("errors/custom.ts"), "", {
     overwrite: true,
   })
-
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   // type alias
   src.addTypeAlias({
     name: "CustomError",
@@ -266,7 +271,9 @@ export function genAnchorErrors(
   const src = project.createSourceFile(outPath("errors/anchor.ts"), "", {
     overwrite: true,
   })
-
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   // type alias
   src.addTypeAlias({
     name: "AnchorError",

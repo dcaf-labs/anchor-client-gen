@@ -1,13 +1,21 @@
-export { initialize } from "./initialize"
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
+export * from "./initialize"
 export type { InitializeAccounts } from "./initialize"
-export { initializeWithValues } from "./initializeWithValues"
+export * from "./initializeWithValues"
 export type {
-  InitializeWithValuesArgs,
+  InitializeWithValuesFields,
   InitializeWithValuesAccounts,
 } from "./initializeWithValues"
-export { initializeWithValues2 } from "./initializeWithValues2"
+export * from "./initializeWithValues2"
 export type {
-  InitializeWithValues2Args,
+  InitializeWithValues2Fields,
   InitializeWithValues2Accounts,
 } from "./initializeWithValues2"
-export { causeError } from "./causeError"
+export * from "./causeError"
+
+export enum ExampleProgramInstructionNames {
+  initialize = "initialize",
+  initializeWithValues = "initializeWithValues",
+  initializeWithValues2 = "initializeWithValues2",
+  causeError = "causeError",
+}

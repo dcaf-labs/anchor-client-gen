@@ -1,14 +1,23 @@
 import { Idl } from "@coral-xyz/anchor"
-import { IdlAccountItem } from "@coral-xyz/anchor/dist/cjs/idl"
-import { CodeBlockWriter, Project, VariableDeclarationKind } from "ts-morph"
+import {
+  CodeBlockWriter,
+  OptionalKind,
+  ParameterDeclarationStructure,
+  Project,
+  VariableDeclarationKind,
+} from "ts-morph"
 import {
   fieldToEncodable,
+  fieldToJSON,
   genIxIdentifier,
   idlTypeToJSONType,
   jsonInterfaceName,
   layoutForType,
+  structFieldInitializer,
   tsTypeFromIdl,
 } from "./common"
+import { IdlAccountItem } from "@coral-xyz/anchor/dist/cjs/idl"
+import camelcase from "camelcase"
 
 export function genInstructions(
   project: Project,
@@ -27,6 +36,10 @@ function capitalize(s: string): string {
   return s[0].toUpperCase() + s.slice(1)
 }
 
+function argsFieldsInterfaceName(ixName: string) {
+  return `${capitalize(ixName)}Fields`
+}
+
 function argsInterfaceName(ixName: string) {
   return `${capitalize(ixName)}Args`
 }
@@ -43,16 +56,18 @@ function genIndexFile(
   const src = project.createSourceFile(outPath("instructions/index.ts"), "", {
     overwrite: true,
   })
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
 
   idl.instructions.forEach((ix) => {
     src.addExportDeclaration({
-      namedExports: [ix.name],
       moduleSpecifier: `./${ix.name}`,
     })
 
     const typeExports: string[] = []
     if (ix.args.length > 0) {
-      typeExports.push(argsInterfaceName(ix.name))
+      typeExports.push(argsFieldsInterfaceName(ix.name))
     }
     if (ix.accounts.length > 0) {
       typeExports.push(accountsInterfaceName(ix.name))
@@ -65,6 +80,19 @@ function genIndexFile(
       })
     }
   })
+  if (idl.instructions.length > 0) {
+    // Create the enum
+    const ixEnum = src.addEnum({
+      name: `${camelcase(idl.name, { pascalCase: true })}InstructionNames`,
+      isExported: true,
+    })
+    for (const ix of idl.instructions) {
+      ixEnum.addMember({
+        name: ix.name,
+        initializer: `"${ix.name}"`,
+      })
+    }
+  }
 }
 
 function genInstructionFiles(
@@ -80,7 +108,9 @@ function genInstructionFiles(
         overwrite: true,
       }
     )
-
+    src.addStatements([
+      `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+    ])
     // imports
     src.addStatements([
       `import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars`,
@@ -94,15 +124,36 @@ function genInstructionFiles(
       `import { PROGRAM_ID } from "../programId"`,
     ])
 
-    // args interface
     if (ix.args.length > 0) {
+      // args fields interface
+      src.addStatements([
+        `// ${argsFieldsInterfaceName(ix.name)} are raw anchor decoded values`,
+      ])
+      src.addInterface({
+        isExported: true,
+        name: argsFieldsInterfaceName(ix.name),
+        properties: ix.args.map((arg) => {
+          return {
+            name: arg.name,
+            type: tsTypeFromIdl(idl, arg.type),
+            docs: arg.docs,
+          }
+        }),
+      })
+      // args interface
+      src.addStatements([
+        `// ${argsInterfaceName(
+          ix.name
+        )} convert properties to type classes if available. This is used for converting to JSON`,
+      ])
       src.addInterface({
         isExported: true,
         name: argsInterfaceName(ix.name),
         properties: ix.args.map((arg) => {
           return {
             name: arg.name,
-            type: tsTypeFromIdl(idl, arg.type),
+            type: tsTypeFromIdl(idl, arg.type, "types.", false),
+            docs: arg.docs,
           }
         }),
       })
@@ -112,7 +163,7 @@ function genInstructionFiles(
     if (ix.args.length > 0) {
       src.addInterface({
         isExported: true,
-        name: jsonInterfaceName(argsInterfaceName(ix.name)),
+        name: jsonInterfaceName(argsFieldsInterfaceName(ix.name)),
         properties: ix.args.map((arg) => {
           return {
             name: arg.name,
@@ -142,7 +193,7 @@ function genInstructionFiles(
             writer.writeLine(`/** ${item.docs.join(" ")} */`)
           }
           writer.write(`${item.name}: `)
-          genAccIfPropTypeRec(item, writer)
+          genAccIfPropTypeRec(item, writer, json)
           writer.newLine()
         })
       })
@@ -184,7 +235,6 @@ function genInstructionFiles(
     // layout
     if (ix.args.length > 0) {
       src.addVariableStatement({
-        isExported: true,
         declarationKind: VariableDeclarationKind.Const,
         declarations: [
           {
@@ -203,79 +253,165 @@ function genInstructionFiles(
       })
     }
 
-    // instruction
-    const ixFn = src.addFunction({
+    // instruction class
+    const cls = src.addClass({
       isExported: true,
-      name: ix.name,
+      name: capitalize(ix.name),
       docs: ix.docs && [ix.docs.join("\n")],
     })
+
+    // name
+    cls.addProperty({
+      isStatic: true,
+      isReadonly: true,
+      name: "ixName",
+      initializer: `'${ix.name}'`,
+    })
+    cls.addProperty({
+      isReadonly: true,
+      name: "identifier",
+      type: "Buffer",
+    })
+    cls.addProperty({
+      isReadonly: true,
+      name: "keys",
+      type: "Array<AccountMeta>",
+    })
+
+    const constructorParameters: OptionalKind<ParameterDeclarationStructure>[] =
+      []
+
+    // args
     if (ix.args.length > 0) {
-      ixFn.addParameter({
+      cls.addProperty({
+        isReadonly: true,
         name: "args",
         type: argsInterfaceName(ix.name),
       })
+      constructorParameters.push({
+        isReadonly: true,
+        name: "fields",
+        type: argsFieldsInterfaceName(ix.name),
+      })
     }
+    // accounts
     if (ix.accounts.length > 0) {
-      ixFn.addParameter({
+      constructorParameters.push({
+        isReadonly: true,
         name: "accounts",
         type: accountsInterfaceName(ix.name),
       })
     }
-    ixFn.addParameter({
+
+    constructorParameters.push({
+      isReadonly: true,
       name: "programId",
       type: "PublicKey",
       initializer: "PROGRAM_ID",
     })
 
-    // keys
-    ixFn.addVariableStatement({
-      declarationKind: VariableDeclarationKind.Const,
-      declarations: [
-        {
-          name: "keys",
-          type: "Array<AccountMeta>",
-          initializer: (writer) => {
-            writer.write("[")
+    cls.addConstructor({
+      parameters: constructorParameters,
+      statements: (writer) => {
+        writer.writeLine(
+          `this.identifier = Buffer.from([${genIxIdentifier(
+            ix.name
+          ).toString()}])`
+        )
 
-            function recurseAccounts(
-              accs: IdlAccountItem[],
-              nestedNames: string[]
-            ) {
-              accs.forEach((item) => {
-                if ("accounts" in item) {
-                  recurseAccounts(item.accounts, [...nestedNames, item.name])
-                  return
-                }
-                writer.writeLine(
-                  `{ pubkey: accounts.${[...nestedNames, item.name].join(
-                    "."
-                  )}, isSigner: ${item.isSigner}, isWritable: ${item.isMut} },`
-                )
-              })
+        function recurseAccounts(
+          accs: IdlAccountItem[],
+          nestedNames: string[]
+        ) {
+          accs.forEach((item) => {
+            if ("accounts" in item) {
+              recurseAccounts(item.accounts, [...nestedNames, item.name])
+              return
             }
+            writer.writeLine(
+              `{ pubkey: this.accounts.${[...nestedNames, item.name].join(
+                "."
+              )}, isSigner: ${item.isSigner}, isWritable: ${item.isMut} },`
+            )
+          })
+        }
+        writer.write(`this.keys = [`)
+        recurseAccounts(ix.accounts, [])
+        writer.writeLine("]")
 
-            recurseAccounts(ix.accounts, [])
-
-            writer.write("]")
-          },
-        },
-      ],
+        // initialize args by converting to classes
+        if (ix.args.length > 0) {
+          writer.write(`this.args = {`)
+          for (const arg of ix.args) {
+            writer.writeLine(
+              `${arg.name}: ${structFieldInitializer(idl, arg)},`
+            )
+          }
+          writer.writeLine("}")
+        }
+      },
     })
 
-    // identifier
-    ixFn.addVariableStatement({
-      declarationKind: VariableDeclarationKind.Const,
-      declarations: [
-        {
-          name: "identifier",
-          initializer: `Buffer.from([${genIxIdentifier(ix.name).toString()}])`,
-        },
-      ],
+    // fromDecoded
+    const fromDecodedMethod = cls.addMethod({
+      isStatic: true,
+      name: "fromDecoded",
     })
-
-    // encode
     if (ix.args.length > 0) {
-      ixFn.addVariableStatement({
+      fromDecodedMethod.addParameter({
+        name: "fields",
+        type: argsFieldsInterfaceName(ix.name),
+      })
+    }
+    if (ix.accounts.length > 0) {
+      fromDecodedMethod.addParameter({
+        name: "flattenedAccounts",
+        type: "PublicKey[]",
+      })
+      fromDecodedMethod.addVariableStatement({
+        declarationKind: VariableDeclarationKind.Const,
+        declarations: [
+          {
+            name: "accounts",
+            initializer: (writer) => {
+              let accountIndex = 0
+              function recurseAccounts(
+                accs: IdlAccountItem[],
+                nestedNames: string[]
+              ) {
+                accs.forEach((item) => {
+                  if ("accounts" in item) {
+                    writer.writeLine(`${item.name}: {`)
+                    recurseAccounts(item.accounts, [...nestedNames, item.name])
+                    writer.writeLine(`},`)
+                  } else {
+                    writer.writeLine(
+                      `${item.name}: flattenedAccounts[${accountIndex}],`
+                    )
+                    accountIndex = accountIndex + 1
+                  }
+                })
+              }
+              writer.writeLine(`{`)
+              recurseAccounts(ix.accounts, [])
+              writer.writeLine("}")
+            },
+          },
+        ],
+      })
+    }
+    fromDecodedMethod.addStatements([
+      `return new ${capitalize(ix.name)}(${
+        ix.args.length > 0 ? "fields," : ""
+      }${ix.accounts.length > 0 ? "accounts" : ""})`,
+    ])
+
+    // build
+    const buildMethod = cls.addMethod({
+      name: "build",
+    })
+    if (ix.args.length > 0) {
+      buildMethod.addVariableStatement({
         declarationKind: VariableDeclarationKind.Const,
         declarations: [
           {
@@ -284,7 +420,7 @@ function genInstructionFiles(
           },
         ],
       })
-      ixFn.addVariableStatement({
+      buildMethod.addVariableStatement({
         declarationKind: VariableDeclarationKind.Const,
         declarations: [
           {
@@ -294,7 +430,7 @@ function genInstructionFiles(
 
               ix.args.forEach((arg) => {
                 writer.writeLine(
-                  `${arg.name}: ${fieldToEncodable(idl, arg, "args.")},`
+                  `${arg.name}: ${fieldToEncodable(idl, arg, "this.fields.")},`
                 )
               })
 
@@ -303,39 +439,91 @@ function genInstructionFiles(
           },
         ],
       })
-      ixFn.addVariableStatement({
+      buildMethod.addVariableStatement({
         declarationKind: VariableDeclarationKind.Const,
         declarations: [
           {
             name: "data",
             initializer:
-              "Buffer.concat([identifier, buffer]).slice(0, 8 + len)",
+              "Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)",
           },
         ],
       })
     } else {
-      ixFn.addVariableStatement({
+      buildMethod.addVariableStatement({
         declarationKind: VariableDeclarationKind.Const,
         declarations: [
           {
             name: "data",
-            initializer: "identifier",
+            initializer: "this.identifier",
           },
         ],
       })
     }
 
     // ret
-    ixFn.addVariableStatement({
+    buildMethod.addVariableStatement({
       declarationKind: VariableDeclarationKind.Const,
       declarations: [
         {
           name: "ix",
-          initializer: "new TransactionInstruction({ keys, programId, data })",
+          initializer:
+            "new TransactionInstruction({ keys: this.keys, programId: this.programId, data })",
         },
       ],
     })
 
-    ixFn.addStatements("return ix")
+    buildMethod.addStatements("return ix")
+
+    // toJSON
+    if (ix.args.length > 0) {
+      cls.addMethod({
+        name: "toArgsJSON",
+        returnType: jsonInterfaceName(argsFieldsInterfaceName(ix.name)),
+        statements: [
+          (writer) => {
+            writer.write(`return {`)
+            ix.args.forEach((arg) => {
+              writer.writeLine(
+                `${arg.name}: ${fieldToJSON(idl, arg, "this.args.")},`
+              )
+            })
+            writer.write("}")
+          },
+        ],
+      })
+    }
+    if (ix.accounts.length > 0) {
+      cls.addMethod({
+        name: "toAccountsJSON",
+        returnType: jsonInterfaceName(accountsInterfaceName(ix.name)),
+        statements: [
+          (writer) => {
+            function recurseAccounts(
+              accs: IdlAccountItem[],
+              nestedNames: string[]
+            ) {
+              accs.forEach((item) => {
+                if ("accounts" in item) {
+                  writer.writeLine(`${item.name}: {`)
+                  recurseAccounts(item.accounts, [...nestedNames, item.name])
+                  writer.writeLine(`},`)
+                } else {
+                  writer.writeLine(
+                    `${item.name}: this.accounts.${[
+                      ...nestedNames,
+                      item.name,
+                    ].join(".")}.toString(),`
+                  )
+                }
+              })
+            }
+            writer.writeLine(`return {`)
+            recurseAccounts(ix.accounts, [])
+            writer.writeLine("}")
+          },
+        ],
+      })
+    }
   })
 }

@@ -37,6 +37,7 @@ export function kindInterfaceName(typeName: string) {
 export function jsonInterfaceName(typeName: string) {
   return `${typeName}JSON`
 }
+
 export function isComplexType(
   ty: IdlType
 ): ty is

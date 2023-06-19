@@ -1,3 +1,4 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 export { State } from "./State"
 export type { StateFields, StateJSON } from "./State"
 export { State2 } from "./State2"

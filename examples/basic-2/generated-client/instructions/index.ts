@@ -1,4 +1,10 @@
-export { create } from "./create"
-export type { CreateArgs, CreateAccounts } from "./create"
-export { increment } from "./increment"
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
+export * from "./create"
+export type { CreateFields, CreateAccounts } from "./create"
+export * from "./increment"
 export type { IncrementAccounts } from "./increment"
+
+export enum Basic2InstructionNames {
+  create = "create",
+  increment = "increment",
+}

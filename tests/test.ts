@@ -9,17 +9,16 @@ import {
   Transaction,
 } from "@solana/web3.js"
 import { expect, it } from "vitest"
-import BN from "bn.js"
 import * as dircompare from "dir-compare"
 import * as fs from "fs"
 import { State, State2 } from "./example-program-gen/act/accounts"
 import { fromTxError } from "./example-program-gen/act/errors"
 import { InvalidProgramId } from "./example-program-gen/act/errors/anchor"
 import {
-  causeError,
-  initialize,
-  initializeWithValues,
-  initializeWithValues2,
+  CauseError,
+  Initialize,
+  InitializeWithValues,
+  InitializeWithValues2,
 } from "./example-program-gen/act/instructions"
 import { BarStruct, FooStruct } from "./example-program-gen/act/types"
 import {
@@ -65,7 +64,7 @@ it("init and account fetch", async () => {
 
   const tx = new Transaction({ feePayer: payer.publicKey })
   tx.add(
-    initialize({
+    new Initialize({
       state: state.publicKey,
       payer: payer.publicKey,
       nested: {
@@ -73,7 +72,7 @@ it("init and account fetch", async () => {
         rent: SYSVAR_RENT_PUBKEY,
       },
       systemProgram: SystemProgram.programId,
-    })
+    }).build()
   )
 
   await sendAndConfirmTransaction(c, tx, [state, payer])
@@ -241,7 +240,7 @@ it("fetch multiple", async () => {
 
   const tx = new Transaction({ feePayer: payer.publicKey })
   tx.add(
-    initialize({
+    new Initialize({
       state: state.publicKey,
       payer: payer.publicKey,
       nested: {
@@ -249,10 +248,10 @@ it("fetch multiple", async () => {
         rent: SYSVAR_RENT_PUBKEY,
       },
       systemProgram: SystemProgram.programId,
-    })
+    }).build()
   )
   tx.add(
-    initialize({
+    new Initialize({
       state: another_state.publicKey,
       payer: payer.publicKey,
       nested: {
@@ -260,7 +259,7 @@ it("fetch multiple", async () => {
         rent: SYSVAR_RENT_PUBKEY,
       },
       systemProgram: SystemProgram.programId,
-    })
+    }).build()
   )
 
   await sendAndConfirmTransaction(c, tx, [state, another_state, payer])
@@ -280,7 +279,7 @@ it("instruction with args", async () => {
 
   const tx = new Transaction({ feePayer: payer.publicKey })
   tx.add(
-    initializeWithValues(
+    new InitializeWithValues(
       {
         boolField: true,
         u8Field: 253,
@@ -378,10 +377,10 @@ it("instruction with args", async () => {
         },
         systemProgram: SystemProgram.programId,
       }
-    )
+    ).build()
   )
   tx.add(
-    initializeWithValues2(
+    new InitializeWithValues2(
       {
         vecOfOption: [null, BigInt(20)],
       },
@@ -390,7 +389,7 @@ it("instruction with args", async () => {
         payer: payer.publicKey,
         systemProgram: SystemProgram.programId,
       }
-    )
+    ).build()
   )
 
   await sendAndConfirmTransaction(c, tx, [state, state2, payer])
@@ -549,13 +548,16 @@ it("instruction with args", async () => {
 
   // vecOfOption
   expect(res2.vecOfOption[0]).toBe(null)
-  expect(res2.vecOfOption[1] !== null && res2.vecOfOption[1].eqn(20)).toBe(true)
+  expect(
+    res2.vecOfOption[1] !== null &&
+      res2.vecOfOption[1].toString() === BigInt(20).toString()
+  ).toBe(true)
 })
 
 it("tx error", async () => {
   const tx = new Transaction({ feePayer: payer.publicKey })
 
-  tx.add(causeError())
+  tx.add(new CauseError().build())
 
   try {
     await sendAndConfirmTransaction(c, tx, [payer])

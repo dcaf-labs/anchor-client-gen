@@ -1,14 +1,19 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
-
+// SetupGameFields are raw anchor decoded values
+export interface SetupGameFields {
+  playerTwo: PublicKey
+}
+// SetupGameArgs convert properties to type classes if available. This is used for converting to JSON
 export interface SetupGameArgs {
   playerTwo: PublicKey
 }
 
-export interface SetupGameArgsJSON {
+export interface SetupGameFieldsJSON {
   playerTwo: string
 }
 
@@ -24,27 +29,71 @@ export interface SetupGameAccountsJSON {
   systemProgram: string
 }
 
-export const layout = borsh.struct([borsh.publicKey("playerTwo")])
+const layout = borsh.struct([borsh.publicKey("playerTwo")])
 
-export function setupGame(
-  args: SetupGameArgs,
-  accounts: SetupGameAccounts,
-  programId: PublicKey = PROGRAM_ID
-) {
-  const keys: Array<AccountMeta> = [
-    { pubkey: accounts.game, isSigner: true, isWritable: true },
-    { pubkey: accounts.playerOne, isSigner: true, isWritable: true },
-    { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-  ]
-  const identifier = Buffer.from([180, 218, 128, 75, 58, 222, 35, 82])
-  const buffer = Buffer.alloc(1000)
-  const len = layout.encode(
-    {
-      playerTwo: args.playerTwo,
-    },
-    buffer
-  )
-  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
-  const ix = new TransactionInstruction({ keys, programId, data })
-  return ix
+export class SetupGame {
+  static readonly ixName = "setupGame"
+  readonly identifier: Buffer
+  readonly keys: Array<AccountMeta>
+  readonly args: SetupGameArgs
+
+  constructor(
+    readonly fields: SetupGameFields,
+    readonly accounts: SetupGameAccounts,
+    readonly programId: PublicKey = PROGRAM_ID
+  ) {
+    this.identifier = Buffer.from([180, 218, 128, 75, 58, 222, 35, 82])
+    this.keys = [
+      { pubkey: this.accounts.game, isSigner: true, isWritable: true },
+      { pubkey: this.accounts.playerOne, isSigner: true, isWritable: true },
+      {
+        pubkey: this.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+    this.args = {
+      playerTwo: fields.playerTwo,
+    }
+  }
+
+  static fromDecoded(fields: SetupGameFields, flattenedAccounts: PublicKey[]) {
+    const accounts = {
+      game: flattenedAccounts[0],
+      playerOne: flattenedAccounts[1],
+      systemProgram: flattenedAccounts[2],
+    }
+    return new SetupGame(fields, accounts)
+  }
+
+  build() {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        playerTwo: this.fields.playerTwo,
+      },
+      buffer
+    )
+    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.keys,
+      programId: this.programId,
+      data,
+    })
+    return ix
+  }
+
+  toArgsJSON(): SetupGameFieldsJSON {
+    return {
+      playerTwo: this.args.playerTwo.toString(),
+    }
+  }
+
+  toAccountsJSON(): SetupGameAccountsJSON {
+    return {
+      game: this.accounts.game.toString(),
+      playerOne: this.accounts.playerOne.toString(),
+      systemProgram: this.accounts.systemProgram.toString(),
+    }
+  }
 }
