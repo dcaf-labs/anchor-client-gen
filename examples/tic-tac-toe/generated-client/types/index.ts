@@ -1,6 +1,7 @@
 import * as GameState from "./GameState"
 import * as Sign from "./Sign"
 
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 export { Tile } from "./Tile"
 export type { TileFields, TileJSON } from "./Tile"
 export { GameState }

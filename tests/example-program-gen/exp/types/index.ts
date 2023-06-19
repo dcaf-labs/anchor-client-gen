@@ -1,5 +1,6 @@
 import * as FooEnum from "./FooEnum"
 
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 export { BarStruct } from "./BarStruct"
 export type { BarStructFields, BarStructJSON } from "./BarStruct"
 export { FooStruct } from "./FooStruct"

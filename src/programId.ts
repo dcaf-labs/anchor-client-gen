@@ -19,7 +19,9 @@ export function genProgramId(
       "\nWARNING: program ID not found in the IDL nor provided with the `--program-id` flag. Edit the generated `programId.ts` file manually to return the correct program ID!\n"
     )
   }
-
+  src?.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   let programIdValue = src
     ?.getVariableDeclaration("PROGRAM_ID")
     ?.getInitializer()

@@ -1,10 +1,11 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
-
-export interface InitializeWithValuesArgs {
+// InitializeWithValuesFields are raw anchor decoded values
+export interface InitializeWithValuesFields {
   boolField: boolean
   u8Field: number
   i8Field: number
@@ -32,6 +33,64 @@ export interface InitializeWithValuesArgs {
   enumField3: types.FooEnumKind
   enumField4: types.FooEnumKind
 }
+// InitializeWithValuesArgs convert properties to type classes if available. This is used for converting to JSON
+export interface InitializeWithValuesArgs {
+  boolField: boolean
+  u8Field: number
+  i8Field: number
+  u16Field: number
+  i16Field: number
+  u32Field: number
+  i32Field: number
+  f32Field: number
+  u64Field: bigint
+  i64Field: bigint
+  f64Field: number
+  u128Field: bigint
+  i128Field: bigint
+  bytesField: Uint8Array
+  stringField: string
+  pubkeyField: PublicKey
+  vecField: Array<bigint>
+  vecStructField: Array<types.FooStruct>
+  optionField: boolean | null
+  optionStructField: types.FooStruct | null
+  structField: types.FooStruct
+  arrayField: Array<boolean>
+  enumField1: types.FooEnumKind
+  enumField2: types.FooEnumKind
+  enumField3: types.FooEnumKind
+  enumField4: types.FooEnumKind
+}
+
+export interface InitializeWithValuesFieldsJSON {
+  boolField: boolean
+  u8Field: number
+  i8Field: number
+  u16Field: number
+  i16Field: number
+  u32Field: number
+  i32Field: number
+  f32Field: number
+  u64Field: string
+  i64Field: string
+  f64Field: number
+  u128Field: string
+  i128Field: string
+  bytesField: Array<number>
+  stringField: string
+  pubkeyField: string
+  vecField: Array<string>
+  vecStructField: Array<types.FooStructJSON>
+  optionField: boolean | null
+  optionStructField: types.FooStructJSON | null
+  structField: types.FooStructJSON
+  arrayField: Array<boolean>
+  enumField1: types.FooEnumJSON
+  enumField2: types.FooEnumJSON
+  enumField3: types.FooEnumJSON
+  enumField4: types.FooEnumJSON
+}
 
 export interface InitializeWithValuesAccounts {
   /** State account */
@@ -45,7 +104,19 @@ export interface InitializeWithValuesAccounts {
   systemProgram: PublicKey
 }
 
-export const layout = borsh.struct([
+export interface InitializeWithValuesAccountsJSON {
+  /** State account */
+  state: string
+  nested: {
+    /** Sysvar clock */
+    clock: string
+    rent: string
+  }
+  payer: string
+  systemProgram: string
+}
+
+const layout = borsh.struct([
   borsh.bool("boolField"),
   borsh.u8("u8Field"),
   borsh.i8("i8Field"),
@@ -75,61 +146,177 @@ export const layout = borsh.struct([
 ])
 
 /** Initializes an account with specified values */
-export function initializeWithValues(
-  args: InitializeWithValuesArgs,
-  accounts: InitializeWithValuesAccounts,
-  programId: PublicKey = PROGRAM_ID
-) {
-  const keys: Array<AccountMeta> = [
-    { pubkey: accounts.state, isSigner: true, isWritable: true },
-    { pubkey: accounts.nested.clock, isSigner: false, isWritable: false },
-    { pubkey: accounts.nested.rent, isSigner: false, isWritable: false },
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
-    { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-  ]
-  const identifier = Buffer.from([220, 73, 8, 213, 178, 69, 181, 141])
-  const buffer = Buffer.alloc(1000)
-  const len = layout.encode(
-    {
-      boolField: args.boolField,
-      u8Field: args.u8Field,
-      i8Field: args.i8Field,
-      u16Field: args.u16Field,
-      i16Field: args.i16Field,
-      u32Field: args.u32Field,
-      i32Field: args.i32Field,
-      f32Field: args.f32Field,
-      u64Field: new BN(args.u64Field.toString()),
-      i64Field: new BN(args.i64Field.toString()),
-      f64Field: args.f64Field,
-      u128Field: new BN(args.u128Field.toString()),
-      i128Field: new BN(args.i128Field.toString()),
-      bytesField: Buffer.from(
-        args.bytesField.buffer,
-        args.bytesField.byteOffset,
-        args.bytesField.length
+export class InitializeWithValues {
+  static readonly ixName = "initializeWithValues"
+  readonly identifier: Buffer
+  readonly keys: Array<AccountMeta>
+  readonly args: InitializeWithValuesArgs
+
+  constructor(
+    readonly fields: InitializeWithValuesFields,
+    readonly accounts: InitializeWithValuesAccounts,
+    readonly programId: PublicKey = PROGRAM_ID
+  ) {
+    this.identifier = Buffer.from([220, 73, 8, 213, 178, 69, 181, 141])
+    this.keys = [
+      { pubkey: this.accounts.state, isSigner: true, isWritable: true },
+      {
+        pubkey: this.accounts.nested.clock,
+        isSigner: false,
+        isWritable: false,
+      },
+      { pubkey: this.accounts.nested.rent, isSigner: false, isWritable: false },
+      { pubkey: this.accounts.payer, isSigner: true, isWritable: true },
+      {
+        pubkey: this.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+    this.args = {
+      boolField: fields.boolField,
+      u8Field: fields.u8Field,
+      i8Field: fields.i8Field,
+      u16Field: fields.u16Field,
+      i16Field: fields.i16Field,
+      u32Field: fields.u32Field,
+      i32Field: fields.i32Field,
+      f32Field: fields.f32Field,
+      u64Field: fields.u64Field,
+      i64Field: fields.i64Field,
+      f64Field: fields.f64Field,
+      u128Field: fields.u128Field,
+      i128Field: fields.i128Field,
+      bytesField: fields.bytesField,
+      stringField: fields.stringField,
+      pubkeyField: fields.pubkeyField,
+      vecField: fields.vecField,
+      vecStructField: fields.vecStructField.map(
+        (item) => new types.FooStruct({ ...item })
       ),
-      stringField: args.stringField,
-      pubkeyField: args.pubkeyField,
-      vecField: args.vecField.map((item) => new BN(item.toString())),
-      vecStructField: args.vecStructField.map((item) =>
-        types.FooStruct.toEncodable(item)
-      ),
-      optionField: args.optionField,
+      optionField: fields.optionField,
       optionStructField:
-        (args.optionStructField &&
-          types.FooStruct.toEncodable(args.optionStructField)) ||
+        (fields.optionStructField &&
+          new types.FooStruct({ ...fields.optionStructField })) ||
         null,
-      structField: types.FooStruct.toEncodable(args.structField),
-      arrayField: args.arrayField,
-      enumField1: args.enumField1.toEncodable(),
-      enumField2: args.enumField2.toEncodable(),
-      enumField3: args.enumField3.toEncodable(),
-      enumField4: args.enumField4.toEncodable(),
-    },
-    buffer
-  )
-  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
-  const ix = new TransactionInstruction({ keys, programId, data })
-  return ix
+      structField: new types.FooStruct({ ...fields.structField }),
+      arrayField: fields.arrayField,
+      enumField1: fields.enumField1,
+      enumField2: fields.enumField2,
+      enumField3: fields.enumField3,
+      enumField4: fields.enumField4,
+    }
+  }
+
+  static fromDecoded(
+    fields: InitializeWithValuesFields,
+    flattenedAccounts: PublicKey[]
+  ) {
+    const accounts = {
+      state: flattenedAccounts[0],
+      nested: {
+        clock: flattenedAccounts[1],
+        rent: flattenedAccounts[2],
+      },
+      payer: flattenedAccounts[3],
+      systemProgram: flattenedAccounts[4],
+    }
+    return new InitializeWithValues(fields, accounts)
+  }
+
+  build() {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        boolField: this.fields.boolField,
+        u8Field: this.fields.u8Field,
+        i8Field: this.fields.i8Field,
+        u16Field: this.fields.u16Field,
+        i16Field: this.fields.i16Field,
+        u32Field: this.fields.u32Field,
+        i32Field: this.fields.i32Field,
+        f32Field: this.fields.f32Field,
+        u64Field: new BN(this.fields.u64Field.toString()),
+        i64Field: new BN(this.fields.i64Field.toString()),
+        f64Field: this.fields.f64Field,
+        u128Field: new BN(this.fields.u128Field.toString()),
+        i128Field: new BN(this.fields.i128Field.toString()),
+        bytesField: Buffer.from(
+          this.fields.bytesField.buffer,
+          this.fields.bytesField.byteOffset,
+          this.fields.bytesField.length
+        ),
+        stringField: this.fields.stringField,
+        pubkeyField: this.fields.pubkeyField,
+        vecField: this.fields.vecField.map((item) => new BN(item.toString())),
+        vecStructField: this.fields.vecStructField.map((item) =>
+          types.FooStruct.toEncodable(item)
+        ),
+        optionField: this.fields.optionField,
+        optionStructField:
+          (this.fields.optionStructField &&
+            types.FooStruct.toEncodable(this.fields.optionStructField)) ||
+          null,
+        structField: types.FooStruct.toEncodable(this.fields.structField),
+        arrayField: this.fields.arrayField,
+        enumField1: this.fields.enumField1.toEncodable(),
+        enumField2: this.fields.enumField2.toEncodable(),
+        enumField3: this.fields.enumField3.toEncodable(),
+        enumField4: this.fields.enumField4.toEncodable(),
+      },
+      buffer
+    )
+    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.keys,
+      programId: this.programId,
+      data,
+    })
+    return ix
+  }
+
+  toArgsJSON(): InitializeWithValuesFieldsJSON {
+    return {
+      boolField: this.args.boolField,
+      u8Field: this.args.u8Field,
+      i8Field: this.args.i8Field,
+      u16Field: this.args.u16Field,
+      i16Field: this.args.i16Field,
+      u32Field: this.args.u32Field,
+      i32Field: this.args.i32Field,
+      f32Field: this.args.f32Field,
+      u64Field: this.args.u64Field.toString(),
+      i64Field: this.args.i64Field.toString(),
+      f64Field: this.args.f64Field,
+      u128Field: this.args.u128Field.toString(),
+      i128Field: this.args.i128Field.toString(),
+      bytesField: Array.from(this.args.bytesField.values()),
+      stringField: this.args.stringField,
+      pubkeyField: this.args.pubkeyField.toString(),
+      vecField: this.args.vecField.map((item) => item.toString()),
+      vecStructField: this.args.vecStructField.map((item) => item.toJSON()),
+      optionField: this.args.optionField,
+      optionStructField:
+        (this.args.optionStructField && this.args.optionStructField.toJSON()) ||
+        null,
+      structField: this.args.structField.toJSON(),
+      arrayField: this.args.arrayField,
+      enumField1: this.args.enumField1.toJSON(),
+      enumField2: this.args.enumField2.toJSON(),
+      enumField3: this.args.enumField3.toJSON(),
+      enumField4: this.args.enumField4.toJSON(),
+    }
+  }
+
+  toAccountsJSON(): InitializeWithValuesAccountsJSON {
+    return {
+      state: this.accounts.state.toString(),
+      nested: {
+        clock: this.accounts.nested.clock.toString(),
+        rent: this.accounts.nested.rent.toString(),
+      },
+      payer: this.accounts.payer.toString(),
+      systemProgram: this.accounts.systemProgram.toString(),
+    }
+  }
 }

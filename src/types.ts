@@ -39,7 +39,9 @@ function genIndexFile(
   const src = project.createSourceFile(outPath("types/index.ts"), "", {
     overwrite: true,
   })
-
+  src.addStatements([
+    `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+  ])
   idl.types?.forEach((ty) => {
     switch (ty.type.kind) {
       case "struct":
@@ -99,6 +101,9 @@ function genTypeFiles(
     const src = project.createSourceFile(outPath(`types/${ty.name}.ts`), "", {
       overwrite: true,
     })
+    src.addStatements([
+      `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+    ])
 
     switch (ty.type.kind) {
       case "struct": {
