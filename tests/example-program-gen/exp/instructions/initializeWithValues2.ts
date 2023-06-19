@@ -37,7 +37,7 @@ export function initializeWithValues2(
   const len = layout.encode(
     {
       vecOfOption: args.vecOfOption.map(
-        (item) => (item && new BN(item)) || null
+        (item) => (item && new BN(item.toString())) || null
       ),
     },
     buffer

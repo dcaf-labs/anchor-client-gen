@@ -99,11 +99,11 @@ export function initializeWithValues(
       u32Field: args.u32Field,
       i32Field: args.i32Field,
       f32Field: args.f32Field,
-      u64Field: new BN(args.u64Field),
-      i64Field: new BN(args.i64Field),
+      u64Field: new BN(args.u64Field.toString()),
+      i64Field: new BN(args.i64Field.toString()),
       f64Field: args.f64Field,
-      u128Field: new BN(args.u128Field),
-      i128Field: new BN(args.i128Field),
+      u128Field: new BN(args.u128Field.toString()),
+      i128Field: new BN(args.i128Field.toString()),
       bytesField: Buffer.from(
         args.bytesField.buffer,
         args.bytesField.byteOffset,
@@ -111,7 +111,7 @@ export function initializeWithValues(
       ),
       stringField: args.stringField,
       pubkeyField: args.pubkeyField,
-      vecField: args.vecField.map((item) => new BN(item)),
+      vecField: args.vecField.map((item) => new BN(item.toString())),
       vecStructField: args.vecStructField.map((item) =>
         types.FooStruct.toEncodable(item)
       ),
