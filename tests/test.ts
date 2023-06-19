@@ -91,14 +91,20 @@ it("init and account fetch", async () => {
   expect(res.u32Field).toBe(1234567891)
   expect(res.i32Field).toBe(-1234567891)
   expect(res.f32Field).toBe(123456.5)
-  expect(res.u64Field.eq(new BN("9223372036854775817"))).toBe(true)
-  expect(res.i64Field.eq(new BN("-4611686018427387914"))).toBe(true)
-  expect(res.f64Field).toBe(1234567891.345)
   expect(
-    res.u128Field.eq(new BN("170141183460469231731687303715884105737"))
+    res.u64Field.toString() === BigInt("9223372036854775817").toString()
   ).toBe(true)
   expect(
-    res.i128Field.eq(new BN("-85070591730234615865843651857942052874"))
+    res.i64Field.toString() === BigInt("-4611686018427387914").toString()
+  ).toBe(true)
+  expect(res.f64Field).toBe(1234567891.345)
+  expect(
+    res.u128Field.toString() ===
+      BigInt("170141183460469231731687303715884105737").toString()
+  ).toBe(true)
+  expect(
+    res.i128Field.toString() ===
+      BigInt("-85070591730234615865843651857942052874").toString()
   ).toBe(true)
   expect(res.bytesField).toEqual(Uint8Array.from([1, 2, 255, 254]))
   expect(res.stringField).toBe("hello")
@@ -110,11 +116,13 @@ it("init and account fetch", async () => {
 
   // vecField
   expect(res.vecField.length).toBe(5)
-  expect(res.vecField[0].eq(new BN("1")))
-  expect(res.vecField[1].eq(new BN("2")))
-  expect(res.vecField[2].eq(new BN("100")))
-  expect(res.vecField[3].eq(new BN("1000")))
-  expect(res.vecField[4].eq(new BN("18446744073709551615")))
+  expect(res.vecField[0].toString() === BigInt("1").toString())
+  expect(res.vecField[1].toString() === BigInt("2").toString())
+  expect(res.vecField[2].toString() === BigInt("100").toString())
+  expect(res.vecField[3].toString() === BigInt("1000").toString())
+  expect(
+    res.vecField[4].toString() === BigInt("18446744073709551615").toString()
+  )
 
   // vecStructField
   expect(res.vecStructField.length).toBe(1)
@@ -282,17 +290,17 @@ it("instruction with args", async () => {
         u32Field: 1234567899,
         i32Field: -123456789,
         f32Field: 123458.5,
-        u64Field: new BN("9223372036854775810"),
-        i64Field: new BN("-4611686018427387912"),
+        u64Field: BigInt("9223372036854775810"),
+        i64Field: BigInt("-4611686018427387912"),
         f64Field: 1234567892.445,
-        u128Field: new BN("170141183460469231731687303715884105740"),
-        i128Field: new BN("-85070591730234615865843651857942052877"),
+        u128Field: BigInt("170141183460469231731687303715884105740"),
+        i128Field: BigInt("-85070591730234615865843651857942052877"),
         bytesField: Uint8Array.from([5, 10, 255]),
         stringField: "string value",
         pubkeyField: new PublicKey(
           "GDddEKTjLBqhskzSMYph5o54VYLQfPCR3PoFqKHLJK6s"
         ),
-        vecField: [new BN(1), new BN("123456789123456789")],
+        vecField: [BigInt(1), BigInt("123456789123456789")],
         vecStructField: [
           new FooStruct({
             field1: 1,
@@ -375,7 +383,7 @@ it("instruction with args", async () => {
   tx.add(
     initializeWithValues2(
       {
-        vecOfOption: [null, new BN(20)],
+        vecOfOption: [null, BigInt(20)],
       },
       {
         state: state2.publicKey,
@@ -404,14 +412,20 @@ it("instruction with args", async () => {
   expect(res.u32Field).toBe(1234567899)
   expect(res.i32Field).toBe(-123456789)
   expect(res.f32Field).toBe(123458.5)
-  expect(res.u64Field.eq(new BN("9223372036854775810"))).toBe(true)
-  expect(res.i64Field.eq(new BN("-4611686018427387912"))).toBe(true)
-  expect(res.f64Field).toBe(1234567892.445)
   expect(
-    res.u128Field.eq(new BN("170141183460469231731687303715884105740"))
+    res.u64Field.toString() === BigInt("9223372036854775810").toString()
   ).toBe(true)
   expect(
-    res.i128Field.eq(new BN("-85070591730234615865843651857942052877"))
+    res.i64Field.toString() === BigInt("-4611686018427387912").toString()
+  ).toBe(true)
+  expect(res.f64Field).toBe(1234567892.445)
+  expect(
+    res.u128Field.toString() ===
+      BigInt("170141183460469231731687303715884105740").toString()
+  ).toBe(true)
+  expect(
+    res.i128Field.toString() ===
+      BigInt("-85070591730234615865843651857942052877").toString()
   ).toBe(true)
   expect(res.bytesField).toEqual(Uint8Array.from([5, 10, 255]))
   expect(res.stringField).toBe("string value")
@@ -423,8 +437,8 @@ it("instruction with args", async () => {
 
   // vecField
   expect(res.vecField.length).toBe(2)
-  expect(res.vecField[0].eq(new BN("1")))
-  expect(res.vecField[1].eq(new BN("123456789123456789")))
+  expect(res.vecField[0].toString() === BigInt("1").toString())
+  expect(res.vecField[1].toString() === BigInt("123456789123456789").toString())
 
   // vecStructField
   expect(res.vecStructField.length).toBe(1)
@@ -615,15 +629,15 @@ it("toJSON", async () => {
     u32Field: 123456789,
     i32Field: -123456789,
     f32Field: 123456.5,
-    u64Field: new BN("9223372036854775805"),
-    i64Field: new BN("4611686018427387910"),
+    u64Field: BigInt("9223372036854775805"),
+    i64Field: BigInt("4611686018427387910"),
     f64Field: 1234567891.35,
-    u128Field: new BN("170141183460469231731687303715884105760"),
-    i128Field: new BN("-85070591730234615865843651857942052897"),
+    u128Field: BigInt("170141183460469231731687303715884105760"),
+    i128Field: BigInt("-85070591730234615865843651857942052897"),
     bytesField: Uint8Array.from([1, 255]),
     stringField: "a string",
     pubkeyField: new PublicKey("EPZP2wrcRtMxrAPJCXVEQaYD9eH7fH7h12YqKDcd4aS7"),
-    vecField: [new BN("10"), new BN("1234567890123456")],
+    vecField: [BigInt("10"), BigInt("1234567890123456")],
     vecStructField: [
       new FooStruct({
         field1: 5,

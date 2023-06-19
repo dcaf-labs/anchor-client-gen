@@ -1,11 +1,10 @@
 import { PublicKey, Connection } from "@solana/web3.js"
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
 export interface CounterFields {
   authority: PublicKey
-  count: BN
+  count: bigint
 }
 
 export interface CounterJSON {
@@ -15,7 +14,7 @@ export interface CounterJSON {
 
 export class Counter {
   readonly authority: PublicKey
-  readonly count: BN
+  readonly count: bigint
 
   static readonly discriminator = Buffer.from([
     255, 176, 4, 245, 188, 253, 124, 25,
@@ -90,7 +89,7 @@ export class Counter {
   static fromJSON(obj: CounterJSON): Counter {
     return new Counter({
       authority: new PublicKey(obj.authority),
-      count: new BN(obj.count),
+      count: BigInt(obj.count),
     })
   }
 }

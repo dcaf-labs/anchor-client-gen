@@ -5,7 +5,7 @@ import * as types from "../types" // eslint-disable-line @typescript-eslint/no-u
 import { PROGRAM_ID } from "../programId"
 
 export interface InitializeWithValues2Args {
-  vecOfOption: Array<BN | null>
+  vecOfOption: Array<bigint | null>
 }
 
 export interface InitializeWithValues2Accounts {
@@ -36,7 +36,9 @@ export function initializeWithValues2(
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
-      vecOfOption: args.vecOfOption,
+      vecOfOption: args.vecOfOption.map(
+        (item) => (item && new BN(item)) || null
+      ),
     },
     buffer
   )
