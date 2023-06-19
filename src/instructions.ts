@@ -4,6 +4,8 @@ import { CodeBlockWriter, Project, VariableDeclarationKind } from "ts-morph"
 import {
   fieldToEncodable,
   genIxIdentifier,
+  idlTypeToJSONType,
+  jsonInterfaceName,
   layoutForType,
   tsTypeFromIdl,
 } from "./common"
@@ -106,13 +108,32 @@ function genInstructionFiles(
       })
     }
 
+    // args json interface
+    if (ix.args.length > 0) {
+      src.addInterface({
+        isExported: true,
+        name: jsonInterfaceName(argsInterfaceName(ix.name)),
+        properties: ix.args.map((arg) => {
+          return {
+            name: arg.name,
+            type: idlTypeToJSONType(arg.type),
+          }
+        }),
+      })
+    }
+
     // accounts interface
     function genAccIfPropTypeRec(
       accItem: IdlAccountItem,
-      writer: CodeBlockWriter
+      writer: CodeBlockWriter,
+      json = false
     ) {
       if (!("accounts" in accItem)) {
-        writer.write("PublicKey")
+        if (json) {
+          writer.write("string")
+        } else {
+          writer.write("PublicKey")
+        }
         return
       }
       writer.block(() => {
@@ -135,7 +156,24 @@ function genInstructionFiles(
           return {
             name: acc.name,
             type: (writer) => {
-              genAccIfPropTypeRec(acc, writer)
+              genAccIfPropTypeRec(acc, writer, false)
+            },
+            docs: acc.docs && [acc.docs.join("\n")],
+          }
+        }),
+      })
+    }
+
+    // accounts json interface
+    if (ix.accounts.length > 0) {
+      src.addInterface({
+        isExported: true,
+        name: jsonInterfaceName(accountsInterfaceName(ix.name)),
+        properties: ix.accounts.map((acc) => {
+          return {
+            name: acc.name,
+            type: (writer) => {
+              genAccIfPropTypeRec(acc, writer, true)
             },
             docs: acc.docs && [acc.docs.join("\n")],
           }

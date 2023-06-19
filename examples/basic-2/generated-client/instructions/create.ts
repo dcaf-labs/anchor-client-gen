@@ -7,10 +7,20 @@ export interface CreateArgs {
   authority: PublicKey
 }
 
+export interface CreateArgsJSON {
+  authority: string
+}
+
 export interface CreateAccounts {
   counter: PublicKey
   user: PublicKey
   systemProgram: PublicKey
+}
+
+export interface CreateAccountsJSON {
+  counter: string
+  user: string
+  systemProgram: string
 }
 
 export const layout = borsh.struct([borsh.publicKey("authority")])

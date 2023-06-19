@@ -33,6 +33,35 @@ export interface InitializeWithValuesArgs {
   enumField4: types.FooEnumKind
 }
 
+export interface InitializeWithValuesArgsJSON {
+  boolField: boolean
+  u8Field: number
+  i8Field: number
+  u16Field: number
+  i16Field: number
+  u32Field: number
+  i32Field: number
+  f32Field: number
+  u64Field: string
+  i64Field: string
+  f64Field: number
+  u128Field: string
+  i128Field: string
+  bytesField: Array<number>
+  stringField: string
+  pubkeyField: string
+  vecField: Array<string>
+  vecStructField: Array<types.FooStructJSON>
+  optionField: boolean | null
+  optionStructField: types.FooStructJSON | null
+  structField: types.FooStructJSON
+  arrayField: Array<boolean>
+  enumField1: types.FooEnumJSON
+  enumField2: types.FooEnumJSON
+  enumField3: types.FooEnumJSON
+  enumField4: types.FooEnumJSON
+}
+
 export interface InitializeWithValuesAccounts {
   /** State account */
   state: PublicKey
@@ -43,6 +72,18 @@ export interface InitializeWithValuesAccounts {
   }
   payer: PublicKey
   systemProgram: PublicKey
+}
+
+export interface InitializeWithValuesAccountsJSON {
+  /** State account */
+  state: string
+  nested: {
+    /** Sysvar clock */
+    clock: PublicKey
+    rent: PublicKey
+  }
+  payer: string
+  systemProgram: string
 }
 
 export const layout = borsh.struct([

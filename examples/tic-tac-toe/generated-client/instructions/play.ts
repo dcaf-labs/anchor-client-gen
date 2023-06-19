@@ -8,9 +8,18 @@ export interface PlayArgs {
   tile: types.TileFields
 }
 
+export interface PlayArgsJSON {
+  tile: types.TileJSON
+}
+
 export interface PlayAccounts {
   game: PublicKey
   player: PublicKey
+}
+
+export interface PlayAccountsJSON {
+  game: string
+  player: string
 }
 
 export const layout = borsh.struct([types.Tile.layout("tile")])

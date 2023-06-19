@@ -8,10 +8,20 @@ export interface InitializeWithValues2Args {
   vecOfOption: Array<bigint | null>
 }
 
+export interface InitializeWithValues2ArgsJSON {
+  vecOfOption: Array<string | null>
+}
+
 export interface InitializeWithValues2Accounts {
   state: PublicKey
   payer: PublicKey
   systemProgram: PublicKey
+}
+
+export interface InitializeWithValues2AccountsJSON {
+  state: string
+  payer: string
+  systemProgram: string
 }
 
 export const layout = borsh.struct([

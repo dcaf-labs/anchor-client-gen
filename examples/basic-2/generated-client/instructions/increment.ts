@@ -8,6 +8,11 @@ export interface IncrementAccounts {
   authority: PublicKey
 }
 
+export interface IncrementAccountsJSON {
+  counter: string
+  authority: string
+}
+
 export function increment(
   accounts: IncrementAccounts,
   programId: PublicKey = PROGRAM_ID

@@ -8,10 +8,20 @@ export interface SetupGameArgs {
   playerTwo: PublicKey
 }
 
+export interface SetupGameArgsJSON {
+  playerTwo: string
+}
+
 export interface SetupGameAccounts {
   game: PublicKey
   playerOne: PublicKey
   systemProgram: PublicKey
+}
+
+export interface SetupGameAccountsJSON {
+  game: string
+  playerOne: string
+  systemProgram: string
 }
 
 export const layout = borsh.struct([borsh.publicKey("playerTwo")])

@@ -16,6 +16,18 @@ export interface InitializeAccounts {
   systemProgram: PublicKey
 }
 
+export interface InitializeAccountsJSON {
+  /** State account */
+  state: string
+  nested: {
+    /** Sysvar clock */
+    clock: PublicKey
+    rent: PublicKey
+  }
+  payer: string
+  systemProgram: string
+}
+
 export function initialize(
   accounts: InitializeAccounts,
   programId: PublicKey = PROGRAM_ID
