@@ -59,23 +59,6 @@ export class Play {
     return new Play(fields, accounts)
   }
 
-  build() {
-    const buffer = Buffer.alloc(1000)
-    const len = layout.encode(
-      {
-        tile: types.Tile.toEncodable(this.fields.tile),
-      },
-      buffer
-    )
-    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toArgsJSON(): PlayFieldsJSON {
     return {
       tile: this.args.tile.toJSON(),

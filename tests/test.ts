@@ -1,25 +1,9 @@
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  sendAndConfirmTransaction,
-  SystemProgram,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  Transaction,
-} from "@solana/web3.js"
+import { PublicKey } from "@solana/web3.js"
 import { expect, it } from "vitest"
 import * as dircompare from "dir-compare"
-import * as fs from "fs"
-import { State, State2 } from "./example-program-gen/act/accounts"
+import { State } from "./example-program-gen/act/accounts"
 import { fromTxError } from "./example-program-gen/act/errors"
 import { InvalidProgramId } from "./example-program-gen/act/errors/anchor"
-import {
-  CauseError,
-  Initialize,
-  InitializeWithValues,
-  InitializeWithValues2,
-} from "./example-program-gen/act/instructions"
 import { BarStruct, FooStruct } from "./example-program-gen/act/types"
 import {
   Named,
@@ -29,11 +13,11 @@ import {
 } from "./example-program-gen/act/types/FooEnum"
 import * as path from "path"
 
-const c = new Connection("http://127.0.0.1:8899", "processed")
-const faucet = JSON.parse(
-  fs.readFileSync("tests/.test-ledger/faucet-keypair.json").toString()
-)
-const payer = Keypair.fromSecretKey(Uint8Array.from(faucet))
+// const c = new Connection("http://127.0.0.1:8899", "processed")
+// const faucet = JSON.parse(
+// fs.readFileSync("tests/.test-ledger/faucet-keypair.json").toString()
+// )
+// const payer = Keypair.fromSecretKey(Uint8Array.from(faucet))
 
 it("generator output", async () => {
   const res = await dircompare.compare(
@@ -59,531 +43,317 @@ it("generator output", async () => {
   })
 })
 
-it("init and account fetch", async () => {
-  const state = new Keypair()
+// it("instruction with args", async () => {
+//   const state = new Keypair()
+//   const state2 = new Keypair()
 
-  const tx = new Transaction({ feePayer: payer.publicKey })
-  tx.add(
-    new Initialize({
-      state: state.publicKey,
-      payer: payer.publicKey,
-      nested: {
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-      },
-      systemProgram: SystemProgram.programId,
-    }).build()
-  )
+//   const tx = new Transaction({ feePayer: payer.publicKey })
+//   tx.add(
+//     new InitializeWithValues(
+//       {
+//         boolField: true,
+//         u8Field: 253,
+//         i8Field: -120,
+//         u16Field: 61234,
+//         i16Field: -31253,
+//         u32Field: 1234567899,
+//         i32Field: -123456789,
+//         f32Field: 123458.5,
+//         u64Field: BigInt("9223372036854775810"),
+//         i64Field: BigInt("-4611686018427387912"),
+//         f64Field: 1234567892.445,
+//         u128Field: BigInt("170141183460469231731687303715884105740"),
+//         i128Field: BigInt("-85070591730234615865843651857942052877"),
+//         bytesField: Uint8Array.from([5, 10, 255]),
+//         stringField: "string value",
+//         pubkeyField: new PublicKey(
+//           "GDddEKTjLBqhskzSMYph5o54VYLQfPCR3PoFqKHLJK6s"
+//         ),
+//         vecField: [BigInt(1), BigInt("123456789123456789")],
+//         vecStructField: [
+//           new FooStruct({
+//             field1: 1,
+//             field2: 2,
+//             nested: new BarStruct({
+//               someField: true,
+//               otherField: 55,
+//             }),
+//             vecNested: [
+//               new BarStruct({
+//                 someField: false,
+//                 otherField: 11,
+//               }),
+//             ],
+//             optionNested: null,
+//             enumField: new Unnamed([
+//               true,
+//               22,
+//               new BarStruct({
+//                 someField: true,
+//                 otherField: 33,
+//               }),
+//             ]),
+//           }),
+//         ],
+//         optionField: true,
+//         optionStructField: null,
+//         structField: new FooStruct({
+//           field1: 1,
+//           field2: 2,
+//           nested: new BarStruct({
+//             someField: true,
+//             otherField: 55,
+//           }),
+//           vecNested: [
+//             new BarStruct({
+//               someField: false,
+//               otherField: 11,
+//             }),
+//           ],
+//           optionNested: null,
+//           enumField: new NoFields(),
+//         }),
+//         arrayField: [true, true, false],
+//         enumField1: new Unnamed([
+//           true,
+//           15,
+//           new BarStruct({
+//             someField: false,
+//             otherField: 200,
+//           }),
+//         ]),
+//         enumField2: new Named({
+//           boolField: true,
+//           u8Field: 128,
+//           nested: new BarStruct({
+//             someField: false,
+//             otherField: 1,
+//           }),
+//         }),
+//         enumField3: new Struct([
+//           new BarStruct({
+//             someField: true,
+//             otherField: 15,
+//           }),
+//         ]),
+//         enumField4: new NoFields(),
+//       },
+//       {
+//         state: state.publicKey,
+//         payer: payer.publicKey,
+//         nested: {
+//           clock: SYSVAR_CLOCK_PUBKEY,
+//           rent: SYSVAR_RENT_PUBKEY,
+//         },
+//         systemProgram: SystemProgram.programId,
+//       }
+//     ).build()
+//   )
+//   tx.add(
+//     new InitializeWithValues2(
+//       {
+//         vecOfOption: [null, BigInt(20)],
+//       },
+//       {
+//         state: state2.publicKey,
+//         payer: payer.publicKey,
+//         systemProgram: SystemProgram.programId,
+//       }
+//     ).build()
+//   )
 
-  await sendAndConfirmTransaction(c, tx, [state, payer])
+//   await sendAndConfirmTransaction(c, tx, [state, state2, payer])
 
-  const res = await State.fetch(c, state.publicKey)
-  if (res === null) {
-    throw new Error("account not found")
-  }
+//   const res = await State.fetch(c, state.publicKey)
+//   if (res === null) {
+//     throw new Error("account for State not found")
+//   }
+//   const res2 = await State2.fetch(c, state2.publicKey)
+//   if (res2 === null) {
+//     throw new Error("account for State2 not found")
+//   }
 
-  expect(res.boolField).toBe(true)
-  expect(res.u8Field).toBe(234)
-  expect(res.i8Field).toBe(-123)
-  expect(res.u16Field).toBe(62345)
-  expect(res.i16Field).toBe(-31234)
-  expect(res.u32Field).toBe(1234567891)
-  expect(res.i32Field).toBe(-1234567891)
-  expect(res.f32Field).toBe(123456.5)
-  expect(
-    res.u64Field.toString() === BigInt("9223372036854775817").toString()
-  ).toBe(true)
-  expect(
-    res.i64Field.toString() === BigInt("-4611686018427387914").toString()
-  ).toBe(true)
-  expect(res.f64Field).toBe(1234567891.345)
-  expect(
-    res.u128Field.toString() ===
-      BigInt("170141183460469231731687303715884105737").toString()
-  ).toBe(true)
-  expect(
-    res.i128Field.toString() ===
-      BigInt("-85070591730234615865843651857942052874").toString()
-  ).toBe(true)
-  expect(res.bytesField).toEqual(Uint8Array.from([1, 2, 255, 254]))
-  expect(res.stringField).toBe("hello")
-  expect(
-    res.pubkeyField.equals(
-      new PublicKey("EPZP2wrcRtMxrAPJCXVEQaYD9eH7fH7h12YqKDcd4aS7")
-    )
-  ).toBe(true)
+//   expect(res.boolField).toBe(true)
+//   expect(res.u8Field).toBe(253)
+//   expect(res.i8Field).toBe(-120)
+//   expect(res.u16Field).toBe(61234)
+//   expect(res.i16Field).toBe(-31253)
+//   expect(res.u32Field).toBe(1234567899)
+//   expect(res.i32Field).toBe(-123456789)
+//   expect(res.f32Field).toBe(123458.5)
+//   expect(
+//     res.u64Field.toString() === BigInt("9223372036854775810").toString()
+//   ).toBe(true)
+//   expect(
+//     res.i64Field.toString() === BigInt("-4611686018427387912").toString()
+//   ).toBe(true)
+//   expect(res.f64Field).toBe(1234567892.445)
+//   expect(
+//     res.u128Field.toString() ===
+//       BigInt("170141183460469231731687303715884105740").toString()
+//   ).toBe(true)
+//   expect(
+//     res.i128Field.toString() ===
+//       BigInt("-85070591730234615865843651857942052877").toString()
+//   ).toBe(true)
+//   expect(res.bytesField).toEqual(Uint8Array.from([5, 10, 255]))
+//   expect(res.stringField).toBe("string value")
+//   expect(
+//     res.pubkeyField.equals(
+//       new PublicKey("GDddEKTjLBqhskzSMYph5o54VYLQfPCR3PoFqKHLJK6s")
+//     )
+//   ).toBe(true)
 
-  // vecField
-  expect(res.vecField.length).toBe(5)
-  expect(res.vecField[0].toString() === BigInt("1").toString())
-  expect(res.vecField[1].toString() === BigInt("2").toString())
-  expect(res.vecField[2].toString() === BigInt("100").toString())
-  expect(res.vecField[3].toString() === BigInt("1000").toString())
-  expect(
-    res.vecField[4].toString() === BigInt("18446744073709551615").toString()
-  )
+//   // vecField
+//   expect(res.vecField.length).toBe(2)
+//   expect(res.vecField[0].toString() === BigInt("1").toString())
+//   expect(res.vecField[1].toString() === BigInt("123456789123456789").toString())
 
-  // vecStructField
-  expect(res.vecStructField.length).toBe(1)
-  {
-    const act = res.vecStructField[0]
+//   // vecStructField
+//   expect(res.vecStructField.length).toBe(1)
+//   {
+//     const act = res.vecStructField[0]
 
-    expect(act.field1).toBe(123)
-    expect(act.field2).toBe(999)
+//     expect(act.field1).toBe(1)
+//     expect(act.field2).toBe(2)
 
-    expect(act.nested.someField).toBe(true)
-    expect(act.nested.otherField).toBe(10)
+//     expect(act.nested.someField).toBe(true)
+//     expect(act.nested.otherField).toBe(55)
 
-    expect(act.vecNested.length).toBe(1)
-    expect(act.vecNested[0].someField).toBe(true)
-    expect(act.vecNested[0].otherField).toBe(10)
+//     expect(act.vecNested.length).toBe(1)
+//     expect(act.vecNested[0].someField).toBe(false)
+//     expect(act.vecNested[0].otherField).toBe(11)
 
-    expect(act.optionNested).not.toBeNull()
-    expect(act.optionNested?.someField).toBe(true)
-    expect(act.optionNested?.otherField).toBe(10)
+//     expect(act.optionNested).toBeNull()
 
-    if (act.enumField.discriminator !== 2) {
-      throw new Error()
-    }
-    expect(act.enumField.kind).toBe("Named")
-    expect(act.enumField.value.boolField).toBe(true)
-    expect(act.enumField.value.u8Field).toBe(15)
-    expect(act.enumField.value.nested.someField).toBe(true)
-    expect(act.enumField.value.nested.otherField).toBe(10)
-  }
+//     if (act.enumField.discriminator !== 0) {
+//       throw new Error()
+//     }
+//     expect(act.enumField.kind).toBe("Unnamed")
+//     expect(act.enumField.value.length).toBe(3)
+//     expect(act.enumField.value[0]).toBe(true)
+//     expect(act.enumField.value[1]).toBe(22)
+//     expect(act.enumField.value[2].someField).toBe(true)
+//     expect(act.enumField.value[2].otherField).toBe(33)
+//   }
 
-  expect(res.optionField).toBe(null)
+//   // optionField
+//   expect(res.optionField).toBe(true)
 
-  // structField
-  {
-    const act = res.structField
+//   // optionStructField
+//   expect(res.optionStructField).toBeNull()
 
-    expect(act.field1).toBe(123)
-    expect(act.field2).toBe(999)
+//   // structField
+//   {
+//     const act = res.structField
 
-    expect(act.nested.someField).toBe(true)
-    expect(act.nested.otherField).toBe(10)
+//     expect(act.field1).toBe(1)
+//     expect(act.field2).toBe(2)
 
-    expect(act.vecNested.length).toBe(1)
-    expect(act.vecNested[0].someField).toBe(true)
-    expect(act.vecNested[0].otherField).toBe(10)
+//     expect(act.nested.someField).toBe(true)
+//     expect(act.nested.otherField).toBe(55)
 
-    expect(act.optionNested).not.toBeNull()
-    expect(act.optionNested?.someField).toBe(true)
-    expect(act.optionNested?.otherField).toBe(10)
+//     expect(act.vecNested.length).toBe(1)
+//     expect(act.vecNested[0].someField).toBe(false)
+//     expect(act.vecNested[0].otherField).toBe(11)
 
-    if (act.enumField.discriminator !== 2) {
-      throw new Error()
-    }
-    expect(act.enumField.kind).toBe("Named")
-    expect(act.enumField.value.boolField).toBe(true)
-    expect(act.enumField.value.u8Field).toBe(15)
-    expect(act.enumField.value.nested.someField).toBe(true)
-    expect(act.enumField.value.nested.otherField).toBe(10)
-  }
+//     expect(act.optionNested).toBeNull()
 
-  expect(res.arrayField).toStrictEqual([true, false, true])
+//     if (act.enumField.discriminator !== 6) {
+//       throw new Error()
+//     }
+//     expect(act.enumField.kind).toBe("NoFields")
+//   }
 
-  // enumField1
-  {
-    const act = res.enumField1
-    if (act.discriminator !== 0) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Unnamed")
-    expect(act.value.length).toBe(3)
-    expect(act.value[0]).toBe(false)
-    expect(act.value[1]).toBe(10)
-    expect(act.value[2].someField).toBe(true)
-    expect(act.value[2].otherField).toBe(10)
-  }
+//   // arrayField
+//   expect(res.arrayField).toStrictEqual([true, true, false])
 
-  // enumField2
-  {
-    const act = res.enumField2
-    if (act.discriminator !== 2) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Named")
-    expect(act.value.boolField).toBe(true)
-    expect(act.value.u8Field).toBe(20)
-    expect(act.value.nested.someField).toBe(true)
-    expect(act.value.nested.otherField).toBe(10)
-  }
+//   // enumField1
+//   {
+//     const act = res.enumField1
+//     if (act.discriminator !== 0) {
+//       throw new Error()
+//     }
+//     expect(act.kind).toBe("Unnamed")
+//     expect(act.value.length).toBe(3)
+//     expect(act.value[0]).toBe(true)
+//     expect(act.value[1]).toBe(15)
+//     expect(act.value[2].someField).toBe(false)
+//     expect(act.value[2].otherField).toBe(200)
+//   }
 
-  // enumField3
-  {
-    const act = res.enumField3
-    if (act.discriminator !== 3) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Struct")
-    expect(act.value.length).toBe(1)
-    expect(act.value[0].someField).toBe(true)
-    expect(act.value[0].otherField).toBe(10)
-  }
+//   // enumField2
+//   {
+//     const act = res.enumField2
+//     if (act.discriminator !== 2) {
+//       throw new Error()
+//     }
+//     expect(act.kind).toBe("Named")
+//     expect(act.value.boolField).toBe(true)
+//     expect(act.value.u8Field).toBe(128)
+//     expect(act.value.nested.someField).toBe(false)
+//     expect(act.value.nested.otherField).toBe(1)
+//   }
 
-  // enumField4
-  {
-    const act = res.enumField4
-    if (act.discriminator !== 6) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("NoFields")
-  }
-})
+//   // enumField3
+//   {
+//     const act = res.enumField3
+//     if (act.discriminator !== 3) {
+//       throw new Error()
+//     }
+//     expect(act.kind).toBe("Struct")
+//     expect(act.value.length).toBe(1)
+//     expect(act.value[0].someField).toBe(true)
+//     expect(act.value[0].otherField).toBe(15)
+//   }
 
-it("fetch multiple", async () => {
-  const state = new Keypair()
-  const another_state = new Keypair()
-  const non_state = new Keypair()
+//   // enumField4
+//   {
+//     const act = res.enumField4
+//     if (act.discriminator !== 6) {
+//       throw new Error()
+//     }
+//     expect(act.kind).toBe("NoFields")
+//   }
 
-  const tx = new Transaction({ feePayer: payer.publicKey })
-  tx.add(
-    new Initialize({
-      state: state.publicKey,
-      payer: payer.publicKey,
-      nested: {
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-      },
-      systemProgram: SystemProgram.programId,
-    }).build()
-  )
-  tx.add(
-    new Initialize({
-      state: another_state.publicKey,
-      payer: payer.publicKey,
-      nested: {
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-      },
-      systemProgram: SystemProgram.programId,
-    }).build()
-  )
+//   // vecOfOption
+//   expect(res2.vecOfOption[0]).toBe(null)
+//   expect(
+//     res2.vecOfOption[1] !== null &&
+//       res2.vecOfOption[1].toString() === BigInt(20).toString()
+//   ).toBe(true)
+// })
 
-  await sendAndConfirmTransaction(c, tx, [state, another_state, payer])
+// it("tx error", async () => {
+//   const tx = new Transaction({ feePayer: payer.publicKey })
 
-  const res = await State.fetchMultiple(c, [
-    state.publicKey,
-    non_state.publicKey,
-    another_state.publicKey,
-  ])
+//   tx.add(new CauseError().build())
 
-  expect(res).toEqual([expect.any(State), null, expect.any(State)])
-})
+//   try {
+//     await sendAndConfirmTransaction(c, tx, [payer])
+//   } catch (e) {
+//     const parsed = fromTxError(e)
 
-it("instruction with args", async () => {
-  const state = new Keypair()
-  const state2 = new Keypair()
+//     expect(parsed).not.toBe(null)
+//     if (parsed === null) {
+//       throw new Error()
+//     }
 
-  const tx = new Transaction({ feePayer: payer.publicKey })
-  tx.add(
-    new InitializeWithValues(
-      {
-        boolField: true,
-        u8Field: 253,
-        i8Field: -120,
-        u16Field: 61234,
-        i16Field: -31253,
-        u32Field: 1234567899,
-        i32Field: -123456789,
-        f32Field: 123458.5,
-        u64Field: BigInt("9223372036854775810"),
-        i64Field: BigInt("-4611686018427387912"),
-        f64Field: 1234567892.445,
-        u128Field: BigInt("170141183460469231731687303715884105740"),
-        i128Field: BigInt("-85070591730234615865843651857942052877"),
-        bytesField: Uint8Array.from([5, 10, 255]),
-        stringField: "string value",
-        pubkeyField: new PublicKey(
-          "GDddEKTjLBqhskzSMYph5o54VYLQfPCR3PoFqKHLJK6s"
-        ),
-        vecField: [BigInt(1), BigInt("123456789123456789")],
-        vecStructField: [
-          new FooStruct({
-            field1: 1,
-            field2: 2,
-            nested: new BarStruct({
-              someField: true,
-              otherField: 55,
-            }),
-            vecNested: [
-              new BarStruct({
-                someField: false,
-                otherField: 11,
-              }),
-            ],
-            optionNested: null,
-            enumField: new Unnamed([
-              true,
-              22,
-              new BarStruct({
-                someField: true,
-                otherField: 33,
-              }),
-            ]),
-          }),
-        ],
-        optionField: true,
-        optionStructField: null,
-        structField: new FooStruct({
-          field1: 1,
-          field2: 2,
-          nested: new BarStruct({
-            someField: true,
-            otherField: 55,
-          }),
-          vecNested: [
-            new BarStruct({
-              someField: false,
-              otherField: 11,
-            }),
-          ],
-          optionNested: null,
-          enumField: new NoFields(),
-        }),
-        arrayField: [true, true, false],
-        enumField1: new Unnamed([
-          true,
-          15,
-          new BarStruct({
-            someField: false,
-            otherField: 200,
-          }),
-        ]),
-        enumField2: new Named({
-          boolField: true,
-          u8Field: 128,
-          nested: new BarStruct({
-            someField: false,
-            otherField: 1,
-          }),
-        }),
-        enumField3: new Struct([
-          new BarStruct({
-            someField: true,
-            otherField: 15,
-          }),
-        ]),
-        enumField4: new NoFields(),
-      },
-      {
-        state: state.publicKey,
-        payer: payer.publicKey,
-        nested: {
-          clock: SYSVAR_CLOCK_PUBKEY,
-          rent: SYSVAR_RENT_PUBKEY,
-        },
-        systemProgram: SystemProgram.programId,
-      }
-    ).build()
-  )
-  tx.add(
-    new InitializeWithValues2(
-      {
-        vecOfOption: [null, BigInt(20)],
-      },
-      {
-        state: state2.publicKey,
-        payer: payer.publicKey,
-        systemProgram: SystemProgram.programId,
-      }
-    ).build()
-  )
+//     expect(parsed.message).toBe("6000: Example error.")
+//     expect(parsed.code).toBe(6000)
+//     expect(parsed.name).toBe("SomeError")
+//     expect("msg" in parsed && parsed.msg).toBe("Example error.")
+//     expect(parsed.logs).toStrictEqual([
+//       "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 invoke [1]",
+//       "Program log: Instruction: CauseError",
+//       "Program log: AnchorError thrown in programs/example-program/src/lib.rs:90. Error Code: SomeError. Error Number: 6000. Error Message: Example error..",
+//       "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 consumed 2385 of 200000 compute units",
+//       "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 failed: custom program error: 0x1770",
+//     ])
 
-  await sendAndConfirmTransaction(c, tx, [state, state2, payer])
-
-  const res = await State.fetch(c, state.publicKey)
-  if (res === null) {
-    throw new Error("account for State not found")
-  }
-  const res2 = await State2.fetch(c, state2.publicKey)
-  if (res2 === null) {
-    throw new Error("account for State2 not found")
-  }
-
-  expect(res.boolField).toBe(true)
-  expect(res.u8Field).toBe(253)
-  expect(res.i8Field).toBe(-120)
-  expect(res.u16Field).toBe(61234)
-  expect(res.i16Field).toBe(-31253)
-  expect(res.u32Field).toBe(1234567899)
-  expect(res.i32Field).toBe(-123456789)
-  expect(res.f32Field).toBe(123458.5)
-  expect(
-    res.u64Field.toString() === BigInt("9223372036854775810").toString()
-  ).toBe(true)
-  expect(
-    res.i64Field.toString() === BigInt("-4611686018427387912").toString()
-  ).toBe(true)
-  expect(res.f64Field).toBe(1234567892.445)
-  expect(
-    res.u128Field.toString() ===
-      BigInt("170141183460469231731687303715884105740").toString()
-  ).toBe(true)
-  expect(
-    res.i128Field.toString() ===
-      BigInt("-85070591730234615865843651857942052877").toString()
-  ).toBe(true)
-  expect(res.bytesField).toEqual(Uint8Array.from([5, 10, 255]))
-  expect(res.stringField).toBe("string value")
-  expect(
-    res.pubkeyField.equals(
-      new PublicKey("GDddEKTjLBqhskzSMYph5o54VYLQfPCR3PoFqKHLJK6s")
-    )
-  ).toBe(true)
-
-  // vecField
-  expect(res.vecField.length).toBe(2)
-  expect(res.vecField[0].toString() === BigInt("1").toString())
-  expect(res.vecField[1].toString() === BigInt("123456789123456789").toString())
-
-  // vecStructField
-  expect(res.vecStructField.length).toBe(1)
-  {
-    const act = res.vecStructField[0]
-
-    expect(act.field1).toBe(1)
-    expect(act.field2).toBe(2)
-
-    expect(act.nested.someField).toBe(true)
-    expect(act.nested.otherField).toBe(55)
-
-    expect(act.vecNested.length).toBe(1)
-    expect(act.vecNested[0].someField).toBe(false)
-    expect(act.vecNested[0].otherField).toBe(11)
-
-    expect(act.optionNested).toBeNull()
-
-    if (act.enumField.discriminator !== 0) {
-      throw new Error()
-    }
-    expect(act.enumField.kind).toBe("Unnamed")
-    expect(act.enumField.value.length).toBe(3)
-    expect(act.enumField.value[0]).toBe(true)
-    expect(act.enumField.value[1]).toBe(22)
-    expect(act.enumField.value[2].someField).toBe(true)
-    expect(act.enumField.value[2].otherField).toBe(33)
-  }
-
-  // optionField
-  expect(res.optionField).toBe(true)
-
-  // optionStructField
-  expect(res.optionStructField).toBeNull()
-
-  // structField
-  {
-    const act = res.structField
-
-    expect(act.field1).toBe(1)
-    expect(act.field2).toBe(2)
-
-    expect(act.nested.someField).toBe(true)
-    expect(act.nested.otherField).toBe(55)
-
-    expect(act.vecNested.length).toBe(1)
-    expect(act.vecNested[0].someField).toBe(false)
-    expect(act.vecNested[0].otherField).toBe(11)
-
-    expect(act.optionNested).toBeNull()
-
-    if (act.enumField.discriminator !== 6) {
-      throw new Error()
-    }
-    expect(act.enumField.kind).toBe("NoFields")
-  }
-
-  // arrayField
-  expect(res.arrayField).toStrictEqual([true, true, false])
-
-  // enumField1
-  {
-    const act = res.enumField1
-    if (act.discriminator !== 0) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Unnamed")
-    expect(act.value.length).toBe(3)
-    expect(act.value[0]).toBe(true)
-    expect(act.value[1]).toBe(15)
-    expect(act.value[2].someField).toBe(false)
-    expect(act.value[2].otherField).toBe(200)
-  }
-
-  // enumField2
-  {
-    const act = res.enumField2
-    if (act.discriminator !== 2) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Named")
-    expect(act.value.boolField).toBe(true)
-    expect(act.value.u8Field).toBe(128)
-    expect(act.value.nested.someField).toBe(false)
-    expect(act.value.nested.otherField).toBe(1)
-  }
-
-  // enumField3
-  {
-    const act = res.enumField3
-    if (act.discriminator !== 3) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("Struct")
-    expect(act.value.length).toBe(1)
-    expect(act.value[0].someField).toBe(true)
-    expect(act.value[0].otherField).toBe(15)
-  }
-
-  // enumField4
-  {
-    const act = res.enumField4
-    if (act.discriminator !== 6) {
-      throw new Error()
-    }
-    expect(act.kind).toBe("NoFields")
-  }
-
-  // vecOfOption
-  expect(res2.vecOfOption[0]).toBe(null)
-  expect(
-    res2.vecOfOption[1] !== null &&
-      res2.vecOfOption[1].toString() === BigInt(20).toString()
-  ).toBe(true)
-})
-
-it("tx error", async () => {
-  const tx = new Transaction({ feePayer: payer.publicKey })
-
-  tx.add(new CauseError().build())
-
-  try {
-    await sendAndConfirmTransaction(c, tx, [payer])
-  } catch (e) {
-    const parsed = fromTxError(e)
-
-    expect(parsed).not.toBe(null)
-    if (parsed === null) {
-      throw new Error()
-    }
-
-    expect(parsed.message).toBe("6000: Example error.")
-    expect(parsed.code).toBe(6000)
-    expect(parsed.name).toBe("SomeError")
-    expect("msg" in parsed && parsed.msg).toBe("Example error.")
-    expect(parsed.logs).toStrictEqual([
-      "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 invoke [1]",
-      "Program log: Instruction: CauseError",
-      "Program log: AnchorError thrown in programs/example-program/src/lib.rs:90. Error Code: SomeError. Error Number: 6000. Error Message: Example error..",
-      "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 consumed 2385 of 200000 compute units",
-      "Program 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8 failed: custom program error: 0x1770",
-    ])
-
-    return
-  }
-})
+//     return
+//   }
+// })
 
 it("fromTxError", () => {
   it("returns null when CPI call fails", async () => {

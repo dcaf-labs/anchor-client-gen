@@ -225,57 +225,6 @@ export class InitializeWithValues {
     return new InitializeWithValues(fields, accounts)
   }
 
-  build() {
-    const buffer = Buffer.alloc(1000)
-    const len = layout.encode(
-      {
-        boolField: this.fields.boolField,
-        u8Field: this.fields.u8Field,
-        i8Field: this.fields.i8Field,
-        u16Field: this.fields.u16Field,
-        i16Field: this.fields.i16Field,
-        u32Field: this.fields.u32Field,
-        i32Field: this.fields.i32Field,
-        f32Field: this.fields.f32Field,
-        u64Field: new BN(this.fields.u64Field.toString()),
-        i64Field: new BN(this.fields.i64Field.toString()),
-        f64Field: this.fields.f64Field,
-        u128Field: new BN(this.fields.u128Field.toString()),
-        i128Field: new BN(this.fields.i128Field.toString()),
-        bytesField: Buffer.from(
-          this.fields.bytesField.buffer,
-          this.fields.bytesField.byteOffset,
-          this.fields.bytesField.length
-        ),
-        stringField: this.fields.stringField,
-        pubkeyField: this.fields.pubkeyField,
-        vecField: this.fields.vecField.map((item) => new BN(item.toString())),
-        vecStructField: this.fields.vecStructField.map((item) =>
-          types.FooStruct.toEncodable(item)
-        ),
-        optionField: this.fields.optionField,
-        optionStructField:
-          (this.fields.optionStructField &&
-            types.FooStruct.toEncodable(this.fields.optionStructField)) ||
-          null,
-        structField: types.FooStruct.toEncodable(this.fields.structField),
-        arrayField: this.fields.arrayField,
-        enumField1: this.fields.enumField1.toEncodable(),
-        enumField2: this.fields.enumField2.toEncodable(),
-        enumField3: this.fields.enumField3.toEncodable(),
-        enumField4: this.fields.enumField4.toEncodable(),
-      },
-      buffer
-    )
-    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toArgsJSON(): InitializeWithValuesFieldsJSON {
     return {
       boolField: this.args.boolField,
