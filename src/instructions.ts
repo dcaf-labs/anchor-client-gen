@@ -7,7 +7,6 @@ import {
   VariableDeclarationKind,
 } from "ts-morph"
 import {
-  fieldToEncodable,
   fieldToJSON,
   genIxIdentifier,
   idlTypeToJSONType,
