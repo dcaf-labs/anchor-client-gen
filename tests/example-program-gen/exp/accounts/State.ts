@@ -4,7 +4,7 @@ import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
-export interface StateFields {
+export interface StateAccount {
   /** A boolean field */
   boolField: boolean
   u8Field: number
@@ -34,7 +34,7 @@ export interface StateFields {
   enumField4: types.FooEnumKind
 }
 
-export interface StateJSON {
+export interface StateAccountJSON {
   /** A boolean field */
   boolField: boolean
   u8Field: number
@@ -127,7 +127,7 @@ export class State {
     types.FooEnum.layout("enumField4"),
   ])
 
-  constructor(fields: StateFields) {
+  constructor(fields: StateAccount) {
     this.boolField = fields.boolField
     this.u8Field = fields.u8Field
     this.i8Field = fields.i8Field
@@ -178,31 +178,12 @@ export class State {
     return this.decode(info.data)
   }
 
-  static async fetchMultiple(
-    c: Connection,
-    addresses: PublicKey[],
-    programId: PublicKey
-  ): Promise<Array<State | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses)
-
-    return infos.map((info) => {
-      if (info === null) {
-        return null
-      }
-      if (programId && !info.owner.equals(programId)) {
-        throw new Error("account doesn't belong to this program")
-      }
-
-      return this.decode(info.data)
-    })
-  }
-
   static decode(data: Buffer): State {
-    if (!data.slice(0, 8).equals(State.discriminator)) {
+    if (!data.subarray(0, 8).equals(State.discriminator)) {
       throw new Error("invalid account discriminator")
     }
 
-    const dec = State.layout.decode(data.slice(8))
+    const dec = State.layout.decode(data.subarray(8))
 
     return new State({
       boolField: dec.boolField,
@@ -245,7 +226,7 @@ export class State {
     })
   }
 
-  toJSON(): StateJSON {
+  toJSON(): StateAccountJSON {
     return {
       boolField: this.boolField,
       u8Field: this.u8Field,
@@ -277,7 +258,7 @@ export class State {
     }
   }
 
-  static fromJSON(obj: StateJSON): State {
+  static fromJSON(obj: StateAccountJSON): State {
     return new State({
       boolField: obj.boolField,
       u8Field: obj.u8Field,

@@ -4,14 +4,14 @@ import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
-export interface GameFields {
+export interface GameAccount {
   players: Array<PublicKey>
   turn: number
   board: Array<Array<types.SignKind | null>>
   state: types.GameStateKind
 }
 
-export interface GameJSON {
+export interface GameAccountJSON {
   players: Array<string>
   turn: number
   board: Array<Array<types.SignJSON | null>>
@@ -35,7 +35,7 @@ export class Game {
     types.GameState.layout("state"),
   ])
 
-  constructor(fields: GameFields) {
+  constructor(fields: GameAccount) {
     this.players = fields.players
     this.turn = fields.turn
     this.board = fields.board
@@ -59,31 +59,12 @@ export class Game {
     return this.decode(info.data)
   }
 
-  static async fetchMultiple(
-    c: Connection,
-    addresses: PublicKey[],
-    programId: PublicKey
-  ): Promise<Array<Game | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses)
-
-    return infos.map((info) => {
-      if (info === null) {
-        return null
-      }
-      if (programId && !info.owner.equals(programId)) {
-        throw new Error("account doesn't belong to this program")
-      }
-
-      return this.decode(info.data)
-    })
-  }
-
   static decode(data: Buffer): Game {
-    if (!data.slice(0, 8).equals(Game.discriminator)) {
+    if (!data.subarray(0, 8).equals(Game.discriminator)) {
       throw new Error("invalid account discriminator")
     }
 
-    const dec = Game.layout.decode(data.slice(8))
+    const dec = Game.layout.decode(data.subarray(8))
 
     return new Game({
       players: dec.players,
@@ -102,7 +83,7 @@ export class Game {
     })
   }
 
-  toJSON(): GameJSON {
+  toJSON(): GameAccountJSON {
     return {
       players: this.players.map((item) => item.toString()),
       turn: this.turn,
@@ -113,7 +94,7 @@ export class Game {
     }
   }
 
-  static fromJSON(obj: GameJSON): Game {
+  static fromJSON(obj: GameAccountJSON): Game {
     return new Game({
       players: obj.players.map((item) => new PublicKey(item)),
       turn: obj.turn,

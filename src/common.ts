@@ -21,6 +21,9 @@ import { snakeCase } from "snake-case"
 export function unreachable(_: never) {
   return undefined
 }
+export function accountInterfaceName(typeName: string) {
+  return `${typeName}Account`
+}
 
 export function fieldsInterfaceName(typeName: string) {
   return `${typeName}Fields`

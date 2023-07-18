@@ -1,9 +1,9 @@
 import { Idl } from "@coral-xyz/anchor"
 import { Project } from "ts-morph"
 import {
+  accountInterfaceName,
   fieldFromDecoded,
   fieldFromJSON,
-  fieldsInterfaceName,
   fieldToJSON,
   genAccDiscriminator,
   idlTypeToJSONType,
@@ -43,7 +43,10 @@ function genIndexFile(
       moduleSpecifier: `./${ix.name}`,
     })
     src.addExportDeclaration({
-      namedExports: [fieldsInterfaceName(ix.name), jsonInterfaceName(ix.name)],
+      namedExports: [
+        accountInterfaceName(ix.name),
+        jsonInterfaceName(accountInterfaceName(ix.name)),
+      ],
       isTypeOnly: true,
       moduleSpecifier: `./${ix.name}`,
     })
@@ -80,9 +83,9 @@ function genAccountFiles(
     const name = acc.name
 
     // fields interface
-    src.addInterface({
+    const accountInterface = src.addInterface({
       isExported: true,
-      name: fieldsInterfaceName(name),
+      name: accountInterfaceName(name),
       properties: fields.map((field) => {
         return {
           name: field.name,
@@ -93,9 +96,9 @@ function genAccountFiles(
     })
 
     // json interface
-    src.addInterface({
+    const accountInterfaceJSON = src.addInterface({
       isExported: true,
-      name: jsonInterfaceName(name),
+      name: jsonInterfaceName(accountInterfaceName(name)),
       properties: fields.map((field) => {
         return {
           name: field.name,
@@ -153,7 +156,7 @@ function genAccountFiles(
       parameters: [
         {
           name: "fields",
-          type: fieldsInterfaceName(name),
+          type: accountInterface.getName(),
         },
       ],
       statements: (writer) => {
@@ -204,54 +207,6 @@ function genAccountFiles(
       ],
     })
 
-    // fetchMultiple
-    cls.addMethod({
-      isStatic: true,
-      isAsync: true,
-      name: "fetchMultiple",
-      parameters: [
-        {
-          name: "c",
-          type: "Connection",
-        },
-        {
-          name: "addresses",
-          type: "PublicKey[]",
-        },
-        {
-          name: "programId",
-          type: "PublicKey",
-        },
-      ],
-      returnType: `Promise<Array<${name} | null>>`,
-      statements: [
-        (writer) => {
-          writer.writeLine(
-            "const infos = await c.getMultipleAccountsInfo(addresses)"
-          )
-          writer.blankLine()
-          writer.write("return infos.map((info) => ")
-          writer.inlineBlock(() => {
-            writer.write("if (info === null)")
-            writer.inlineBlock(() => {
-              writer.writeLine("return null")
-            })
-            writer.write("")
-
-            writer.write("if (programId && !info.owner.equals(programId))")
-            writer.inlineBlock(() => {
-              writer.writeLine(
-                `throw new Error("account doesn't belong to this program")`
-              )
-            })
-            writer.blankLine()
-            writer.writeLine("return this.decode(info.data)")
-          })
-          writer.write(")")
-        },
-      ],
-    })
-
     // decode
     cls.addMethod({
       isStatic: true,
@@ -265,12 +220,16 @@ function genAccountFiles(
       returnType: name,
       statements: [
         (writer) => {
-          writer.write(`if (!data.slice(0, 8).equals(${name}.discriminator))`)
+          writer.write(
+            `if (!data.subarray(0, 8).equals(${name}.discriminator))`
+          )
           writer.inlineBlock(() => {
             writer.writeLine(`throw new Error("invalid account discriminator")`)
           })
           writer.blankLine()
-          writer.writeLine(`const dec = ${name}.layout.decode(data.slice(8))`)
+          writer.writeLine(
+            `const dec = ${name}.layout.decode(data.subarray(8))`
+          )
 
           writer.blankLine()
           writer.write(`return new ${name}({`)
@@ -286,7 +245,7 @@ function genAccountFiles(
     // toJSON
     cls.addMethod({
       name: "toJSON",
-      returnType: jsonInterfaceName(name),
+      returnType: accountInterfaceJSON.getName(),
       statements: [
         (writer) => {
           writer.write(`return {`)
@@ -310,7 +269,7 @@ function genAccountFiles(
       parameters: [
         {
           name: "obj",
-          type: jsonInterfaceName(name),
+          type: accountInterfaceJSON.getName(),
         },
       ],
       statements: [

@@ -4,11 +4,11 @@ import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
-export interface State2Fields {
+export interface State2Account {
   vecOfOption: Array<bigint | null>
 }
 
-export interface State2JSON {
+export interface State2AccountJSON {
   vecOfOption: Array<string | null>
 }
 
@@ -23,7 +23,7 @@ export class State2 {
     borsh.vec(borsh.option(borsh.u64()), "vecOfOption"),
   ])
 
-  constructor(fields: State2Fields) {
+  constructor(fields: State2Account) {
     this.vecOfOption = fields.vecOfOption
   }
 
@@ -44,38 +44,19 @@ export class State2 {
     return this.decode(info.data)
   }
 
-  static async fetchMultiple(
-    c: Connection,
-    addresses: PublicKey[],
-    programId: PublicKey
-  ): Promise<Array<State2 | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses)
-
-    return infos.map((info) => {
-      if (info === null) {
-        return null
-      }
-      if (programId && !info.owner.equals(programId)) {
-        throw new Error("account doesn't belong to this program")
-      }
-
-      return this.decode(info.data)
-    })
-  }
-
   static decode(data: Buffer): State2 {
-    if (!data.slice(0, 8).equals(State2.discriminator)) {
+    if (!data.subarray(0, 8).equals(State2.discriminator)) {
       throw new Error("invalid account discriminator")
     }
 
-    const dec = State2.layout.decode(data.slice(8))
+    const dec = State2.layout.decode(data.subarray(8))
 
     return new State2({
       vecOfOption: dec.vecOfOption,
     })
   }
 
-  toJSON(): State2JSON {
+  toJSON(): State2AccountJSON {
     return {
       vecOfOption: this.vecOfOption.map(
         (item) => (item && item.toString()) || null
@@ -83,7 +64,7 @@ export class State2 {
     }
   }
 
-  static fromJSON(obj: State2JSON): State2 {
+  static fromJSON(obj: State2AccountJSON): State2 {
     return new State2({
       vecOfOption: obj.vecOfOption.map(
         (item) => (item && BigInt(item)) || null

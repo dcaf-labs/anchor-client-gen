@@ -3,12 +3,12 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 
-export interface CounterFields {
+export interface CounterAccount {
   authority: PublicKey
   count: bigint
 }
 
-export interface CounterJSON {
+export interface CounterAccountJSON {
   authority: string
   count: string
 }
@@ -26,7 +26,7 @@ export class Counter {
     borsh.u64("count"),
   ])
 
-  constructor(fields: CounterFields) {
+  constructor(fields: CounterAccount) {
     this.authority = fields.authority
     this.count = fields.count
   }
@@ -48,31 +48,12 @@ export class Counter {
     return this.decode(info.data)
   }
 
-  static async fetchMultiple(
-    c: Connection,
-    addresses: PublicKey[],
-    programId: PublicKey
-  ): Promise<Array<Counter | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses)
-
-    return infos.map((info) => {
-      if (info === null) {
-        return null
-      }
-      if (programId && !info.owner.equals(programId)) {
-        throw new Error("account doesn't belong to this program")
-      }
-
-      return this.decode(info.data)
-    })
-  }
-
   static decode(data: Buffer): Counter {
-    if (!data.slice(0, 8).equals(Counter.discriminator)) {
+    if (!data.subarray(0, 8).equals(Counter.discriminator)) {
       throw new Error("invalid account discriminator")
     }
 
-    const dec = Counter.layout.decode(data.slice(8))
+    const dec = Counter.layout.decode(data.subarray(8))
 
     return new Counter({
       authority: dec.authority,
@@ -80,14 +61,14 @@ export class Counter {
     })
   }
 
-  toJSON(): CounterJSON {
+  toJSON(): CounterAccountJSON {
     return {
       authority: this.authority.toString(),
       count: this.count.toString(),
     }
   }
 
-  static fromJSON(obj: CounterJSON): Counter {
+  static fromJSON(obj: CounterAccountJSON): Counter {
     return new Counter({
       authority: new PublicKey(obj.authority),
       count: BigInt(obj.count),
