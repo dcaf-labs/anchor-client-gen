@@ -74,7 +74,6 @@ function genAccountFiles(
       ...(idl.types && idl.types.length > 0
         ? [`import * as types from "../types"`]
         : []),
-      `import { PROGRAM_ID } from "../programId"`,
     ])
 
     const fields = acc.type.fields
@@ -182,7 +181,6 @@ function genAccountFiles(
         {
           name: "programId",
           type: "PublicKey",
-          initializer: "PROGRAM_ID",
         },
       ],
       returnType: `Promise<${name} | null>`,
@@ -223,7 +221,6 @@ function genAccountFiles(
         {
           name: "programId",
           type: "PublicKey",
-          initializer: "PROGRAM_ID",
         },
       ],
       returnType: `Promise<Array<${name} | null>>`,
@@ -241,7 +238,7 @@ function genAccountFiles(
             })
             writer.write("")
 
-            writer.write("if (!info.owner.equals(programId))")
+            writer.write("if (programId && !info.owner.equals(programId))")
             writer.inlineBlock(() => {
               writer.writeLine(
                 `throw new Error("account doesn't belong to this program")`

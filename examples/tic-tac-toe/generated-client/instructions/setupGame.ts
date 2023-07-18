@@ -4,7 +4,6 @@ import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
-import { PROGRAM_ID } from "../programId"
 // SetupGameFields are raw anchor decoded values
 export interface SetupGameFields {
   playerTwo: PublicKey
@@ -40,8 +39,7 @@ export class SetupGame {
 
   constructor(
     readonly fields: SetupGameFields,
-    readonly accounts: SetupGameAccounts,
-    readonly programId: PublicKey = PROGRAM_ID
+    readonly accounts: SetupGameAccounts
   ) {
     this.identifier = Buffer.from([180, 218, 128, 75, 58, 222, 35, 82])
     this.keys = [

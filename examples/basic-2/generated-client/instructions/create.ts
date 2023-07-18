@@ -3,7 +3,6 @@
 import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
-import { PROGRAM_ID } from "../programId"
 // CreateFields are raw anchor decoded values
 export interface CreateFields {
   authority: PublicKey
@@ -39,8 +38,7 @@ export class Create {
 
   constructor(
     readonly fields: CreateFields,
-    readonly accounts: CreateAccounts,
-    readonly programId: PublicKey = PROGRAM_ID
+    readonly accounts: CreateAccounts
   ) {
     this.identifier = Buffer.from([24, 30, 200, 40, 5, 28, 7, 119])
     this.keys = [

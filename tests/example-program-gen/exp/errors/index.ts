@@ -1,6 +1,5 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey } from "@solana/web3.js"
-import { PROGRAM_ID } from "../programId"
 import * as anchor from "./anchor"
 import * as custom from "./custom"
 
@@ -24,7 +23,7 @@ const errorRe = /Program (\w+) failed: custom program error: (\w+)/
 
 export function fromTxError(
   err: unknown,
-  programId: PublicKey = PROGRAM_ID
+  programId: PublicKey
 ): custom.CustomError | anchor.AnchorError | null {
   if (
     typeof err !== "object" ||

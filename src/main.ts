@@ -7,7 +7,6 @@ import { Project } from "ts-morph"
 import { genAccounts } from "./accounts"
 import { genErrors } from "./errors"
 import { genInstructions } from "./instructions"
-import { genProgramId } from "./programId"
 import { genTypes } from "./types"
 import { program } from "commander"
 import * as prettier from "prettier"
@@ -28,7 +27,6 @@ async function main() {
 
   const idlPath = program.args[0]
   const outBase = program.args[1]
-  const programIdOpt: string | null = program.opts().programId || null
 
   function outPath(filePath: string) {
     return path.join(outBase, filePath)
@@ -39,8 +37,6 @@ async function main() {
 
   const project = new Project()
 
-  console.log("generating programId.ts...")
-  genProgramId(project, idl, programIdOpt, outPath)
   console.log("generating errors...")
   genErrors(project, idl, outPath)
   console.log("generating instructions...")

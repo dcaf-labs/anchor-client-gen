@@ -2,7 +2,6 @@
 /* eslint-disable */
 import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
-import { PROGRAM_ID } from "../programId"
 
 export interface CounterFields {
   authority: PublicKey
@@ -35,7 +34,7 @@ export class Counter {
   static async fetch(
     c: Connection,
     address: PublicKey,
-    programId: PublicKey = PROGRAM_ID
+    programId: PublicKey
   ): Promise<Counter | null> {
     const info = await c.getAccountInfo(address)
 
@@ -52,7 +51,7 @@ export class Counter {
   static async fetchMultiple(
     c: Connection,
     addresses: PublicKey[],
-    programId: PublicKey = PROGRAM_ID
+    programId: PublicKey
   ): Promise<Array<Counter | null>> {
     const infos = await c.getMultipleAccountsInfo(addresses)
 
@@ -60,7 +59,7 @@ export class Counter {
       if (info === null) {
         return null
       }
-      if (!info.owner.equals(programId)) {
+      if (programId && !info.owner.equals(programId)) {
         throw new Error("account doesn't belong to this program")
       }
 

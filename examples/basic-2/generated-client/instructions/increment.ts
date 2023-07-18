@@ -3,7 +3,6 @@
 import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
-import { PROGRAM_ID } from "../programId"
 
 export interface IncrementAccounts {
   counter: PublicKey
@@ -20,10 +19,7 @@ export class Increment {
   readonly identifier: Buffer
   readonly keys: Array<AccountMeta>
 
-  constructor(
-    readonly accounts: IncrementAccounts,
-    readonly programId: PublicKey = PROGRAM_ID
-  ) {
+  constructor(readonly accounts: IncrementAccounts) {
     this.identifier = Buffer.from([11, 18, 104, 9, 104, 174, 59, 33])
     this.keys = [
       { pubkey: this.accounts.counter, isSigner: false, isWritable: true },

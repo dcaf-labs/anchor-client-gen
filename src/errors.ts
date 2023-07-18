@@ -31,10 +31,6 @@ export function genIndex(
   ])
   src.addStatements([`import { PublicKey } from "@solana/web3.js"`])
   src.addImportDeclaration({
-    namedImports: ["PROGRAM_ID"],
-    moduleSpecifier: "../programId",
-  })
-  src.addImportDeclaration({
     namespaceImport: "anchor",
     moduleSpecifier: "./anchor",
   })
@@ -118,7 +114,6 @@ export function genIndex(
       {
         name: "programId",
         type: "PublicKey",
-        initializer: "PROGRAM_ID",
       },
     ],
     returnType: hasCustomErrors

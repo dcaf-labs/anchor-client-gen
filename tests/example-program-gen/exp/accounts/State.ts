@@ -3,7 +3,6 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
-import { PROGRAM_ID } from "../programId"
 
 export interface StateFields {
   /** A boolean field */
@@ -165,7 +164,7 @@ export class State {
   static async fetch(
     c: Connection,
     address: PublicKey,
-    programId: PublicKey = PROGRAM_ID
+    programId: PublicKey
   ): Promise<State | null> {
     const info = await c.getAccountInfo(address)
 
@@ -182,7 +181,7 @@ export class State {
   static async fetchMultiple(
     c: Connection,
     addresses: PublicKey[],
-    programId: PublicKey = PROGRAM_ID
+    programId: PublicKey
   ): Promise<Array<State | null>> {
     const infos = await c.getMultipleAccountsInfo(addresses)
 
@@ -190,7 +189,7 @@ export class State {
       if (info === null) {
         return null
       }
-      if (!info.owner.equals(programId)) {
+      if (programId && !info.owner.equals(programId)) {
         throw new Error("account doesn't belong to this program")
       }
 

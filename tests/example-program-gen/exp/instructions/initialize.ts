@@ -4,7 +4,6 @@ import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
-import { PROGRAM_ID } from "../programId"
 
 export interface InitializeAccounts {
   /** State account */
@@ -35,10 +34,7 @@ export class Initialize {
   readonly identifier: Buffer
   readonly keys: Array<AccountMeta>
 
-  constructor(
-    readonly accounts: InitializeAccounts,
-    readonly programId: PublicKey = PROGRAM_ID
-  ) {
+  constructor(readonly accounts: InitializeAccounts) {
     this.identifier = Buffer.from([175, 175, 109, 31, 13, 152, 155, 237])
     this.keys = [
       { pubkey: this.accounts.state, isSigner: true, isWritable: true },
