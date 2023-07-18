@@ -2,9 +2,7 @@
   "name": "@dcaf/anchor-client-gen",
   "description": "A tool for generating solana web3 clients from anchor IDLs.",
   "version": "0.28.1-beta.2",
-  "bin": {
-    "anchor-client-gen": "dist/main.js"
-  },
+  "bin": "dist/main.js",
   "license": "MIT",
   "homepage": "https://github.com/dcaf-labs/anchor-client-gen",
   "type": "module",
@@ -15,7 +13,7 @@
     "build:test-fixture": "yarn build:example-program && yarn build:test-fixture:copy-idl && yarn build:test-fixture:generate-exp",
     "build:test-fixture:copy-idl": "cp tests/example-program/target/idl/example_program.json tests/example-program-gen/idl.json",
     "build:test-fixture:generate-exp": "rimraf tests/example-program-gen/exp && node ./dist/main.js tests/example-program-gen/idl.json tests/example-program-gen/exp --program-id 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8",
-    "build:example-program": "cd tests/example-program && npx anchor build",
+    "build:example-program": "cd tests/example-program && anchor build",
     "generate-examples": "rimraf ./examples/**/generated-client && yarn generate-examples:basic-2 && yarn generate-examples:tic-tac-toe",
     "generate-examples:basic-2": "node ./dist/main.js examples/basic-2/idl.json examples/basic-2/generated-client --program-id Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
     "generate-examples:tic-tac-toe": "node ./dist/main.js examples/tic-tac-toe/idl.json examples/tic-tac-toe/generated-client --program-id Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
@@ -29,7 +27,6 @@
     "check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@coral-xyz/anchor-cli": "0.28.0",
     "@types/bn.js": "^5.1.1",
     "@types/eslint": "^8.40.1",
     "@typescript-eslint/eslint-plugin": "^5.59.9",

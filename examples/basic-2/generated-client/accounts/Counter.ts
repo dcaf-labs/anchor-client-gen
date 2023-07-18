@@ -1,6 +1,7 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
+/* eslint-disable */
 import { PublicKey, Connection } from "@solana/web3.js"
-import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@coral-xyz/borsh"
 import { PROGRAM_ID } from "../programId"
 
 export interface CounterFields {
