@@ -4,7 +4,6 @@ import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
-import { PROGRAM_ID } from "../programId"
 // InitializeWithValues2Fields are raw anchor decoded values
 export interface InitializeWithValues2Fields {
   vecOfOption: Array<bigint | null>
@@ -46,8 +45,7 @@ export class InitializeWithValues2 {
 
   constructor(
     readonly fields: InitializeWithValues2Fields,
-    readonly accounts: InitializeWithValues2Accounts,
-    readonly programId: PublicKey = PROGRAM_ID
+    readonly accounts: InitializeWithValues2Accounts
   ) {
     this.identifier = Buffer.from([248, 190, 21, 97, 239, 148, 39, 181])
     this.keys = [

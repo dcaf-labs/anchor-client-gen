@@ -119,7 +119,6 @@ function genInstructionFiles(
       ...(idl.types && idl.types.length > 0
         ? [`import * as types from "../types"`]
         : []),
-      `import { PROGRAM_ID } from "../programId"`,
     ])
 
     if (ix.args.length > 0) {
@@ -300,13 +299,6 @@ function genInstructionFiles(
         type: accountsInterfaceName(ix.name),
       })
     }
-
-    constructorParameters.push({
-      isReadonly: true,
-      name: "programId",
-      type: "PublicKey",
-      initializer: "PROGRAM_ID",
-    })
 
     cls.addConstructor({
       parameters: constructorParameters,

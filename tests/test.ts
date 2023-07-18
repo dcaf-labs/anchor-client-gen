@@ -369,7 +369,12 @@ it("fromTxError", () => {
       ],
     }
 
-    expect(fromTxError(errMock)).toBe(null)
+    expect(
+      fromTxError(
+        errMock,
+        new PublicKey("3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8")
+      )
+    ).toBe(null)
   })
 
   it("parses anchor error correctly", () => {
@@ -387,7 +392,12 @@ it("fromTxError", () => {
       ],
     }
 
-    expect(fromTxError(errMock)).toBeInstanceOf(InvalidProgramId)
+    expect(
+      fromTxError(
+        errMock,
+        new PublicKey("3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8")
+      )
+    ).toBeInstanceOf(InvalidProgramId)
   })
 })
 

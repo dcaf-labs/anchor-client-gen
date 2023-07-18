@@ -4,7 +4,6 @@ import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
 import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
-import { PROGRAM_ID } from "../programId"
 // PlayFields are raw anchor decoded values
 export interface PlayFields {
   tile: types.TileFields
@@ -36,11 +35,7 @@ export class Play {
   readonly keys: Array<AccountMeta>
   readonly args: PlayArgs
 
-  constructor(
-    readonly fields: PlayFields,
-    readonly accounts: PlayAccounts,
-    readonly programId: PublicKey = PROGRAM_ID
-  ) {
+  constructor(readonly fields: PlayFields, readonly accounts: PlayAccounts) {
     this.identifier = Buffer.from([213, 157, 193, 142, 228, 56, 248, 150])
     this.keys = [
       { pubkey: this.accounts.game, isSigner: false, isWritable: true },
