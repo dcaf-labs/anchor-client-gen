@@ -129,9 +129,10 @@ function genStruct(
 ) {
   // imports
   src.addStatements([
-    `import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars`,
-    `import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars`,
-    `import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars`,
+    `/* eslint-disable */`,
+    `import { PublicKey } from "@solana/web3.js"`,
+    `import BN from "bn.js"`,
+    `import * as types from "../types"`,
     `import * as borsh from "@coral-xyz/borsh"`,
   ])
 
@@ -239,11 +240,6 @@ function genStruct(
       },
     ],
   })
-  cls.insertText(
-    fromDecoded.getStart(),
-    "// eslint-disable-next-line @typescript-eslint/no-explicit-any\n"
-  )
-
   // static toEncodable
   cls.addMethod({
     isStatic: true,
@@ -327,8 +323,9 @@ function genEnum(
 ) {
   // imports
   src.addStatements([
-    `import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars`,
-    `import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars`,
+    `/* eslint-disable */`,
+    `import { PublicKey } from "@solana/web3.js"`,
+    `import * as types from "../types"`,
     `import * as borsh from "@coral-xyz/borsh"`,
   ])
 
@@ -680,10 +677,6 @@ function genEnum(
       },
     ],
   })
-  src.insertText(
-    fromDecoded.getStart(),
-    "// eslint-disable-next-line @typescript-eslint/no-explicit-any\n"
-  )
   // fromJSON
   src.addFunction({
     isExported: true,

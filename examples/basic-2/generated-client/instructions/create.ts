@@ -1,7 +1,8 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
-import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+/* eslint-disable */
+import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js"
+import BN from "bn.js"
+import * as borsh from "@coral-xyz/borsh"
 import { PROGRAM_ID } from "../programId"
 // CreateFields are raw anchor decoded values
 export interface CreateFields {
