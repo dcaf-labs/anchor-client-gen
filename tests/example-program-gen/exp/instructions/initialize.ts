@@ -70,16 +70,6 @@ export class Initialize {
     return new Initialize(accounts)
   }
 
-  build() {
-    const data = this.identifier
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toAccountsJSON(): InitializeAccountsJSON {
     return {
       state: this.accounts.state.toString(),

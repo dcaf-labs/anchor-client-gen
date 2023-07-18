@@ -76,25 +76,6 @@ export class InitializeWithValues2 {
     return new InitializeWithValues2(fields, accounts)
   }
 
-  build() {
-    const buffer = Buffer.alloc(1000)
-    const len = layout.encode(
-      {
-        vecOfOption: this.fields.vecOfOption.map(
-          (item) => (item && new BN(item.toString())) || null
-        ),
-      },
-      buffer
-    )
-    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toArgsJSON(): InitializeWithValues2FieldsJSON {
     return {
       vecOfOption: this.args.vecOfOption.map(

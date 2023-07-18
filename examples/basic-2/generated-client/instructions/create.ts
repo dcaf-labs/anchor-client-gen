@@ -66,23 +66,6 @@ export class Create {
     return new Create(fields, accounts)
   }
 
-  build() {
-    const buffer = Buffer.alloc(1000)
-    const len = layout.encode(
-      {
-        authority: this.fields.authority,
-      },
-      buffer
-    )
-    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toArgsJSON(): CreateFieldsJSON {
     return {
       authority: this.args.authority.toString(),

@@ -39,16 +39,6 @@ export class Increment {
     return new Increment(accounts)
   }
 
-  build() {
-    const data = this.identifier
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toAccountsJSON(): IncrementAccountsJSON {
     return {
       counter: this.accounts.counter.toString(),

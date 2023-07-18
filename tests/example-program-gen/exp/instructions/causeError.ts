@@ -19,14 +19,4 @@ export class CauseError {
   static fromDecoded() {
     return new CauseError()
   }
-
-  build() {
-    const data = this.identifier
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
 }

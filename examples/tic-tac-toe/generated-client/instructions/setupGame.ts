@@ -67,23 +67,6 @@ export class SetupGame {
     return new SetupGame(fields, accounts)
   }
 
-  build() {
-    const buffer = Buffer.alloc(1000)
-    const len = layout.encode(
-      {
-        playerTwo: this.fields.playerTwo,
-      },
-      buffer
-    )
-    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({
-      keys: this.keys,
-      programId: this.programId,
-      data,
-    })
-    return ix
-  }
-
   toArgsJSON(): SetupGameFieldsJSON {
     return {
       playerTwo: this.args.playerTwo.toString(),
