@@ -35,13 +35,6 @@ export class Tile {
     })
   }
 
-  static toEncodable(fields: TileFields) {
-    return {
-      row: fields.row,
-      column: fields.column,
-    }
-  }
-
   toJSON(): TileJSON {
     return {
       row: this.row,
@@ -54,9 +47,5 @@ export class Tile {
       row: obj.row,
       column: obj.column,
     })
-  }
-
-  toEncodable() {
-    return Tile.toEncodable(this)
   }
 }

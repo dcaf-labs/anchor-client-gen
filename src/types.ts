@@ -6,7 +6,6 @@ import {
   fieldFromDecoded,
   fieldToJSON,
   unreachable,
-  fieldToEncodable,
   layoutForType,
   tsTypeFromIdl,
   fieldsInterfaceName,
@@ -240,30 +239,6 @@ function genStruct(
       },
     ],
   })
-  // static toEncodable
-  cls.addMethod({
-    isStatic: true,
-    name: "toEncodable",
-    parameters: [
-      {
-        name: "fields",
-        type: fieldsInterfaceName(name),
-      },
-    ],
-    statements: [
-      (writer) => {
-        writer.write(`return {`)
-
-        fields.forEach((field) => {
-          writer.writeLine(
-            `${field.name}: ${fieldToEncodable(idl, field, "fields.")},`
-          )
-        })
-
-        writer.write("}")
-      },
-    ],
-  })
 
   // toJSON
   cls.addMethod({
@@ -306,12 +281,6 @@ function genStruct(
         writer.write("})")
       },
     ],
-  })
-
-  // toEncodable
-  cls.addMethod({
-    name: "toEncodable",
-    statements: [`return ${name}.toEncodable(this)`],
   })
 }
 
@@ -574,37 +543,6 @@ function genEnum(
       name: "toJSON",
       returnType: jsonInterfaceName(variant.name),
       statements: [toJSONstmt],
-    })
-
-    // toEncodable
-    const toEncodableStmt: WriterFunction = (writer) => {
-      writer.write(`return`).inlineBlock(() => {
-        writer.writeLine(`${variant.name}: {`)
-
-        fields?.forEach((field, i) => {
-          if (typeof field === "object" && "name" in field) {
-            const encodable = fieldToEncodable(
-              idl,
-              { ...field, name: camelcase(field.name) },
-              "this.value."
-            )
-            writer.writeLine(`${field.name}: ${encodable},`)
-          } else {
-            const encodable = fieldToEncodable(
-              idl,
-              { type: field, name: `[${i}]` },
-              "this.value"
-            )
-            writer.writeLine(`_${i}: ${encodable},`)
-          }
-        })
-
-        writer.writeLine(`}`)
-      })
-    }
-    cls.addMethod({
-      name: "toEncodable",
-      statements: [toEncodableStmt],
     })
   })
 
