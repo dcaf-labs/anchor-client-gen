@@ -45,6 +45,10 @@ export class SetupGame {
 
   constructor(readonly instructionData: SetupGameInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(SetupGame.identifier)
+  }
+
   static fromDecoded(
     args: SetupGameArgs,
     flattenedAccounts: PublicKey[]

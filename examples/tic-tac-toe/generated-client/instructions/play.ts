@@ -43,6 +43,10 @@ export class Play {
 
   constructor(readonly instructionData: PlayInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(Play.identifier)
+  }
+
   static fromDecoded(args: PlayArgs, flattenedAccounts: PublicKey[]): Play {
     const accounts = {
       game: flattenedAccounts[0],

@@ -44,6 +44,10 @@ export class Create {
 
   constructor(readonly instructionData: CreateInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(Create.identifier)
+  }
+
   static fromDecoded(args: CreateArgs, flattenedAccounts: PublicKey[]): Create {
     const accounts = {
       counter: flattenedAccounts[0],

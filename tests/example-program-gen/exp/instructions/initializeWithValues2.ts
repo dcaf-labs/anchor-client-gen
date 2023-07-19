@@ -51,6 +51,10 @@ export class InitializeWithValues2 {
 
   constructor(readonly instructionData: InitializeWithValues2Instruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(InitializeWithValues2.identifier)
+  }
+
   static fromDecoded(
     args: InitializeWithValues2Args,
     flattenedAccounts: PublicKey[]

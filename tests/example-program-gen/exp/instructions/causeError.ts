@@ -23,6 +23,10 @@ export class CauseError {
 
   constructor(readonly instructionData: CauseErrorInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(CauseError.identifier)
+  }
+
   static fromDecoded(): CauseError {
     return new CauseError({ args: null, accounts: null })
   }

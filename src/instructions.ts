@@ -318,6 +318,24 @@ function genInstructionFiles(
         },
       ],
     })
+    const isIdentifierEqual = cls.addMethod({
+      isStatic: true,
+      name: "isIdentifierEqual",
+      parameters: [
+        {
+          name: "ixData",
+          type: "Buffer",
+        },
+      ],
+      returnType: "boolean",
+      statements: [
+        (writer) => {
+          writer.write(
+            `return ixData.subarray(0, 8).equals(${cls.getName()}.identifier)`
+          )
+        },
+      ],
+    })
 
     // fromDecoded
     const fromDecodedMethod = cls.addMethod({

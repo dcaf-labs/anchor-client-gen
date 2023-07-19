@@ -47,6 +47,10 @@ export class Initialize {
 
   constructor(readonly instructionData: InitializeInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(Initialize.identifier)
+  }
+
   static fromDecoded(flattenedAccounts: PublicKey[]): Initialize {
     const accounts = {
       state: flattenedAccounts[0],

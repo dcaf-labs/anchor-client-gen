@@ -32,6 +32,10 @@ export class Increment {
 
   constructor(readonly instructionData: IncrementInstruction) {}
 
+  static isIdentifierEqual(ixData: Buffer): boolean {
+    return ixData.subarray(0, 8).equals(Increment.identifier)
+  }
+
   static fromDecoded(flattenedAccounts: PublicKey[]): Increment {
     const accounts = {
       counter: flattenedAccounts[0],
