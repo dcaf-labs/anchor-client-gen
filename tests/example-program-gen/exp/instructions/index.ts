@@ -3,12 +3,12 @@ export * from "./initialize"
 export type { InitializeAccounts } from "./initialize"
 export * from "./initializeWithValues"
 export type {
-  InitializeWithValuesFields,
+  InitializeWithValuesArgs,
   InitializeWithValuesAccounts,
 } from "./initializeWithValues"
 export * from "./initializeWithValues2"
 export type {
-  InitializeWithValues2Fields,
+  InitializeWithValues2Args,
   InitializeWithValues2Accounts,
 } from "./initializeWithValues2"
 export * from "./causeError"

@@ -5,17 +5,38 @@ import BN from "bn.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
+export interface CauseErrorInstruction {
+  args: null
+  accounts: null
+}
+
+export interface CauseErrorInstructionJSON {
+  args: null
+  accounts: null
+}
+
 export class CauseError {
   static readonly ixName = "causeError"
-  readonly identifier: Buffer
-  readonly keys: Array<AccountMeta>
+  static readonly identifier: Buffer = Buffer.from([
+    67, 104, 37, 17, 2, 155, 68, 17,
+  ])
 
-  constructor() {
-    this.identifier = Buffer.from([67, 104, 37, 17, 2, 155, 68, 17])
-    this.keys = []
+  constructor(readonly instructionData: CauseErrorInstruction) {}
+
+  static fromDecoded(): CauseError {
+    return new CauseError({ args: null, accounts: null })
   }
 
-  static fromDecoded() {
-    return new CauseError()
+  toArgsJSON(): null {
+    return null
+  }
+
+  toAccountsJSON(): null {
+    return null
+    return {}
+  }
+
+  toJSON(): CauseErrorInstructionJSON {
+    return { args: this.toArgsJSON(), accounts: this.toAccountsJSON() }
   }
 }

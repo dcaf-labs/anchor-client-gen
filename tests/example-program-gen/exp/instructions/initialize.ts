@@ -29,31 +29,25 @@ export interface InitializeAccountsJSON {
   systemProgram: string
 }
 
+export interface InitializeInstruction {
+  args: null
+  accounts: InitializeAccounts
+}
+
+export interface InitializeInstructionJSON {
+  args: null
+  accounts: InitializeAccountsJSON
+}
+
 export class Initialize {
   static readonly ixName = "initialize"
-  readonly identifier: Buffer
-  readonly keys: Array<AccountMeta>
+  static readonly identifier: Buffer = Buffer.from([
+    175, 175, 109, 31, 13, 152, 155, 237,
+  ])
 
-  constructor(readonly accounts: InitializeAccounts) {
-    this.identifier = Buffer.from([175, 175, 109, 31, 13, 152, 155, 237])
-    this.keys = [
-      { pubkey: this.accounts.state, isSigner: true, isWritable: true },
-      {
-        pubkey: this.accounts.nested.clock,
-        isSigner: false,
-        isWritable: false,
-      },
-      { pubkey: this.accounts.nested.rent, isSigner: false, isWritable: false },
-      { pubkey: this.accounts.payer, isSigner: true, isWritable: true },
-      {
-        pubkey: this.accounts.systemProgram,
-        isSigner: false,
-        isWritable: false,
-      },
-    ]
-  }
+  constructor(readonly instructionData: InitializeInstruction) {}
 
-  static fromDecoded(flattenedAccounts: PublicKey[]) {
+  static fromDecoded(flattenedAccounts: PublicKey[]): Initialize {
     const accounts = {
       state: flattenedAccounts[0],
       nested: {
@@ -63,18 +57,26 @@ export class Initialize {
       payer: flattenedAccounts[3],
       systemProgram: flattenedAccounts[4],
     }
-    return new Initialize(accounts)
+    return new Initialize({ args: null, accounts })
+  }
+
+  toArgsJSON(): null {
+    return null
   }
 
   toAccountsJSON(): InitializeAccountsJSON {
     return {
-      state: this.accounts.state.toString(),
+      state: this.instructionData.accounts.state.toString(),
       nested: {
-        clock: this.accounts.nested.clock.toString(),
-        rent: this.accounts.nested.rent.toString(),
+        clock: this.instructionData.accounts.nested.clock.toString(),
+        rent: this.instructionData.accounts.nested.rent.toString(),
       },
-      payer: this.accounts.payer.toString(),
-      systemProgram: this.accounts.systemProgram.toString(),
+      payer: this.instructionData.accounts.payer.toString(),
+      systemProgram: this.instructionData.accounts.systemProgram.toString(),
     }
+  }
+
+  toJSON(): InitializeInstructionJSON {
+    return { args: this.toArgsJSON(), accounts: this.toAccountsJSON() }
   }
 }
