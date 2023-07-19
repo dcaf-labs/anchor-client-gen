@@ -19,10 +19,7 @@ export interface GameAccountJSON {
 }
 
 export class Game {
-  readonly players: Array<PublicKey>
-  readonly turn: number
-  readonly board: Array<Array<types.SignKind | null>>
-  readonly state: types.GameStateKind
+  readonly data: GameAccount
 
   static readonly discriminator = Buffer.from([
     27, 90, 166, 125, 74, 100, 121, 18,
@@ -36,15 +33,21 @@ export class Game {
   ])
 
   constructor(accountData: GameAccount) {
-    this.players = accountData.players
-    this.turn = accountData.turn
-    this.board = accountData.board
-    this.state = accountData.state
+    this.data = {
+      players: accountData.players,
+      turn: accountData.turn,
+      board: accountData.board,
+      state: accountData.state,
+    }
+  }
+
+  static isDiscriminatorEqual(data: Buffer): boolean {
+    return data.subarray(0, 8).equals(Game.discriminator)
   }
 
   static decode(data: Buffer): Game {
-    if (!data.subarray(0, 8).equals(Game.discriminator)) {
-      throw new Error("invalid account discriminator")
+    if (!Game.isDiscriminatorEqual(data)) {
+      throw new Error("Invalid account discriminator.")
     }
 
     const dec = Game.layout.decode(data.subarray(8))
@@ -52,15 +55,8 @@ export class Game {
     return new Game({
       players: dec.players,
       turn: dec.turn,
-      board: dec.board.map(
-        (
-          item: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-        ) =>
-          item.map(
-            (
-              item: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-            ) => (item && types.Sign.fromDecoded(item)) || null
-          )
+      board: dec.board.map((item: any) =>
+        item.map((item: any) => (item && types.Sign.fromDecoded(item)) || null)
       ),
       state: types.GameState.fromDecoded(dec.state),
     })
@@ -77,7 +73,7 @@ export class Game {
       return null
     }
     if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
+      throw new Error("Account doesn't belong to this program.")
     }
     return this.decode(info.data)
   }
@@ -87,7 +83,7 @@ export class Game {
     address: PublicKey,
     programId: PublicKey,
     getAccountInfoConfig?: GetAccountInfoConfig,
-    notFoundError: Error = new Error("Account with address not found")
+    notFoundError: Error = new Error("Account with address not found.")
   ): Promise<Game> {
     const account = await Game.fetch(
       c,
@@ -101,15 +97,19 @@ export class Game {
     return account
   }
 
-  toJSON(): GameAccountJSON {
+  static toJSON(data: GameAccount): GameAccountJSON {
     return {
-      players: this.players.map((item) => item.toString()),
-      turn: this.turn,
-      board: this.board.map((item) =>
+      players: data.players.map((item) => item.toString()),
+      turn: data.turn,
+      board: data.board.map((item) =>
         item.map((item) => (item && item.toJSON()) || null)
       ),
-      state: this.state.toJSON(),
+      state: data.state.toJSON(),
     }
+  }
+
+  toJSON(): GameAccountJSON {
+    return Game.toJSON(this.data)
   }
 
   static fromJSON(obj: GameAccountJSON): Game {

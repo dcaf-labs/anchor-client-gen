@@ -113,14 +113,21 @@ function genAccountFiles(
     const cls = src.addClass({
       isExported: true,
       name: name,
-      properties: fields.map((field) => {
-        return {
+      // properties: fields.map((field) => {
+      //   return {
+      //     isReadonly: true,
+      //     name: field.name,
+      //     type: tsTypeFromIdl(idl, field.type, "types.", false),
+      //     docs: field.docs && [field.docs.join("\n")],
+      //   }
+      // }),
+      properties: [
+        {
           isReadonly: true,
-          name: field.name,
-          type: tsTypeFromIdl(idl, field.type, "types.", false),
-          docs: field.docs && [field.docs.join("\n")],
-        }
-      }),
+          name: "data",
+          type: accountInterface.getName(),
+        },
+      ],
       docs: acc.docs && [acc.docs.join("\n")],
     })
 
@@ -161,11 +168,38 @@ function genAccountFiles(
         },
       ],
       statements: (writer) => {
-        fields.forEach((field) => {
-          const initializer = structFieldInitializer(idl, field, "accountData.")
-          writer.writeLine(`this.${field.name} = ${initializer}`)
+        writer.write("this.data = ")
+        writer.inlineBlock(() => {
+          fields.forEach((field) => {
+            const initializer = structFieldInitializer(
+              idl,
+              field,
+              "accountData."
+            )
+            writer.writeLine(`${field.name}: ${initializer},`)
+          })
         })
       },
+    })
+
+    // isAccount
+    const isDiscriminatorEqual = cls.addMethod({
+      isStatic: true,
+      name: `isDiscriminatorEqual`,
+      parameters: [
+        {
+          name: "data",
+          type: "Buffer",
+        },
+      ],
+      returnType: "boolean",
+      statements: [
+        (writer) => {
+          writer.write(
+            `return data.subarray(0, 8).equals(${name}.discriminator)`
+          )
+        },
+      ],
     })
 
     // decode
@@ -182,10 +216,12 @@ function genAccountFiles(
       statements: [
         (writer) => {
           writer.write(
-            `if (!data.subarray(0, 8).equals(${name}.discriminator))`
+            `if (!${cls.getName()}.${isDiscriminatorEqual.getName()}(data))`
           )
           writer.inlineBlock(() => {
-            writer.writeLine(`throw new Error("invalid account discriminator")`)
+            writer.writeLine(
+              `throw new Error("Invalid account discriminator.")`
+            )
           })
           writer.blankLine()
           writer.writeLine(
@@ -240,7 +276,7 @@ function genAccountFiles(
           writer.write("if (!info.owner.equals(programId))")
           writer.inlineBlock(() => {
             writer.writeLine(
-              `throw new Error("account doesn't belong to this program")`
+              `throw new Error("Account doesn't belong to this program.")`
             )
           })
           writer.writeLine(`return this.${decode.getName()}(info.data)`)
@@ -273,7 +309,7 @@ function genAccountFiles(
         {
           name: "notFoundError",
           type: "Error",
-          initializer: `new Error("Account with address not found")`,
+          initializer: `new Error("Account with address not found.")`,
         },
       ],
       returnType: `Promise<${name}>`,
@@ -292,8 +328,15 @@ function genAccountFiles(
     })
 
     // toJSON
-    cls.addMethod({
+    const staticToJSON = cls.addMethod({
+      isStatic: true,
       name: "toJSON",
+      parameters: [
+        {
+          name: "data",
+          type: accountInterface.getName(),
+        },
+      ],
       returnType: accountInterfaceJSON.getName(),
       statements: [
         (writer) => {
@@ -301,11 +344,23 @@ function genAccountFiles(
 
           fields.forEach((field) => {
             writer.writeLine(
-              `${field.name}: ${fieldToJSON(idl, field, "this.")},`
+              `${field.name}: ${fieldToJSON(idl, field, "data.")},`
             )
           })
 
           writer.write("}")
+        },
+      ],
+    })
+
+    cls.addMethod({
+      name: "toJSON",
+      returnType: accountInterfaceJSON.getName(),
+      statements: [
+        (writer) => {
+          writer.write(
+            `return ${cls.getName()}.${staticToJSON.getName()}(this.data)`
+          )
         },
       ],
     })

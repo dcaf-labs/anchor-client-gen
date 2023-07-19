@@ -13,7 +13,7 @@ export interface State2AccountJSON {
 }
 
 export class State2 {
-  readonly vecOfOption: Array<bigint | null>
+  readonly data: State2Account
 
   static readonly discriminator = Buffer.from([
     106, 97, 255, 161, 250, 205, 185, 192,
@@ -24,12 +24,18 @@ export class State2 {
   ])
 
   constructor(accountData: State2Account) {
-    this.vecOfOption = accountData.vecOfOption
+    this.data = {
+      vecOfOption: accountData.vecOfOption,
+    }
+  }
+
+  static isDiscriminatorEqual(data: Buffer): boolean {
+    return data.subarray(0, 8).equals(State2.discriminator)
   }
 
   static decode(data: Buffer): State2 {
-    if (!data.subarray(0, 8).equals(State2.discriminator)) {
-      throw new Error("invalid account discriminator")
+    if (!State2.isDiscriminatorEqual(data)) {
+      throw new Error("Invalid account discriminator.")
     }
 
     const dec = State2.layout.decode(data.subarray(8))
@@ -50,7 +56,7 @@ export class State2 {
       return null
     }
     if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
+      throw new Error("Account doesn't belong to this program.")
     }
     return this.decode(info.data)
   }
@@ -60,7 +66,7 @@ export class State2 {
     address: PublicKey,
     programId: PublicKey,
     getAccountInfoConfig?: GetAccountInfoConfig,
-    notFoundError: Error = new Error("Account with address not found")
+    notFoundError: Error = new Error("Account with address not found.")
   ): Promise<State2> {
     const account = await State2.fetch(
       c,
@@ -74,12 +80,16 @@ export class State2 {
     return account
   }
 
-  toJSON(): State2AccountJSON {
+  static toJSON(data: State2Account): State2AccountJSON {
     return {
-      vecOfOption: this.vecOfOption.map(
+      vecOfOption: data.vecOfOption.map(
         (item) => (item && item.toString()) || null
       ),
     }
+  }
+
+  toJSON(): State2AccountJSON {
+    return State2.toJSON(this.data)
   }
 
   static fromJSON(obj: State2AccountJSON): State2 {

@@ -66,33 +66,7 @@ export interface StateAccountJSON {
 
 /** An account containing various fields */
 export class State {
-  /** A boolean field */
-  readonly boolField: boolean
-  readonly u8Field: number
-  readonly i8Field: number
-  readonly u16Field: number
-  readonly i16Field: number
-  readonly u32Field: number
-  readonly i32Field: number
-  readonly f32Field: number
-  readonly u64Field: bigint
-  readonly i64Field: bigint
-  readonly f64Field: number
-  readonly u128Field: bigint
-  readonly i128Field: bigint
-  readonly bytesField: Uint8Array
-  readonly stringField: string
-  readonly pubkeyField: PublicKey
-  readonly vecField: Array<bigint>
-  readonly vecStructField: Array<types.FooStruct>
-  readonly optionField: boolean | null
-  readonly optionStructField: types.FooStruct | null
-  readonly structField: types.FooStruct
-  readonly arrayField: Array<boolean>
-  readonly enumField1: types.FooEnumKind
-  readonly enumField2: types.FooEnumKind
-  readonly enumField3: types.FooEnumKind
-  readonly enumField4: types.FooEnumKind
+  readonly data: StateAccount
 
   static readonly discriminator = Buffer.from([
     216, 146, 107, 94, 104, 75, 182, 177,
@@ -128,42 +102,48 @@ export class State {
   ])
 
   constructor(accountData: StateAccount) {
-    this.boolField = accountData.boolField
-    this.u8Field = accountData.u8Field
-    this.i8Field = accountData.i8Field
-    this.u16Field = accountData.u16Field
-    this.i16Field = accountData.i16Field
-    this.u32Field = accountData.u32Field
-    this.i32Field = accountData.i32Field
-    this.f32Field = accountData.f32Field
-    this.u64Field = accountData.u64Field
-    this.i64Field = accountData.i64Field
-    this.f64Field = accountData.f64Field
-    this.u128Field = accountData.u128Field
-    this.i128Field = accountData.i128Field
-    this.bytesField = accountData.bytesField
-    this.stringField = accountData.stringField
-    this.pubkeyField = accountData.pubkeyField
-    this.vecField = accountData.vecField
-    this.vecStructField = accountData.vecStructField.map(
-      (item) => new types.FooStruct({ ...item })
-    )
-    this.optionField = accountData.optionField
-    this.optionStructField =
-      (accountData.optionStructField &&
-        new types.FooStruct({ ...accountData.optionStructField })) ||
-      null
-    this.structField = new types.FooStruct({ ...accountData.structField })
-    this.arrayField = accountData.arrayField
-    this.enumField1 = accountData.enumField1
-    this.enumField2 = accountData.enumField2
-    this.enumField3 = accountData.enumField3
-    this.enumField4 = accountData.enumField4
+    this.data = {
+      boolField: accountData.boolField,
+      u8Field: accountData.u8Field,
+      i8Field: accountData.i8Field,
+      u16Field: accountData.u16Field,
+      i16Field: accountData.i16Field,
+      u32Field: accountData.u32Field,
+      i32Field: accountData.i32Field,
+      f32Field: accountData.f32Field,
+      u64Field: accountData.u64Field,
+      i64Field: accountData.i64Field,
+      f64Field: accountData.f64Field,
+      u128Field: accountData.u128Field,
+      i128Field: accountData.i128Field,
+      bytesField: accountData.bytesField,
+      stringField: accountData.stringField,
+      pubkeyField: accountData.pubkeyField,
+      vecField: accountData.vecField,
+      vecStructField: accountData.vecStructField.map(
+        (item) => new types.FooStruct({ ...item })
+      ),
+      optionField: accountData.optionField,
+      optionStructField:
+        (accountData.optionStructField &&
+          new types.FooStruct({ ...accountData.optionStructField })) ||
+        null,
+      structField: new types.FooStruct({ ...accountData.structField }),
+      arrayField: accountData.arrayField,
+      enumField1: accountData.enumField1,
+      enumField2: accountData.enumField2,
+      enumField3: accountData.enumField3,
+      enumField4: accountData.enumField4,
+    }
+  }
+
+  static isDiscriminatorEqual(data: Buffer): boolean {
+    return data.subarray(0, 8).equals(State.discriminator)
   }
 
   static decode(data: Buffer): State {
-    if (!data.subarray(0, 8).equals(State.discriminator)) {
-      throw new Error("invalid account discriminator")
+    if (!State.isDiscriminatorEqual(data)) {
+      throw new Error("Invalid account discriminator.")
     }
 
     const dec = State.layout.decode(data.subarray(8))
@@ -190,10 +170,8 @@ export class State {
       stringField: dec.stringField,
       pubkeyField: dec.pubkeyField,
       vecField: dec.vecField,
-      vecStructField: dec.vecStructField.map(
-        (
-          item: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-        ) => types.FooStruct.fromDecoded(item)
+      vecStructField: dec.vecStructField.map((item: any) =>
+        types.FooStruct.fromDecoded(item)
       ),
       optionField: dec.optionField,
       optionStructField:
@@ -220,7 +198,7 @@ export class State {
       return null
     }
     if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
+      throw new Error("Account doesn't belong to this program.")
     }
     return this.decode(info.data)
   }
@@ -230,7 +208,7 @@ export class State {
     address: PublicKey,
     programId: PublicKey,
     getAccountInfoConfig?: GetAccountInfoConfig,
-    notFoundError: Error = new Error("Account with address not found")
+    notFoundError: Error = new Error("Account with address not found.")
   ): Promise<State> {
     const account = await State.fetch(
       c,
@@ -244,36 +222,40 @@ export class State {
     return account
   }
 
-  toJSON(): StateAccountJSON {
+  static toJSON(data: StateAccount): StateAccountJSON {
     return {
-      boolField: this.boolField,
-      u8Field: this.u8Field,
-      i8Field: this.i8Field,
-      u16Field: this.u16Field,
-      i16Field: this.i16Field,
-      u32Field: this.u32Field,
-      i32Field: this.i32Field,
-      f32Field: this.f32Field,
-      u64Field: this.u64Field.toString(),
-      i64Field: this.i64Field.toString(),
-      f64Field: this.f64Field,
-      u128Field: this.u128Field.toString(),
-      i128Field: this.i128Field.toString(),
-      bytesField: Array.from(this.bytesField.values()),
-      stringField: this.stringField,
-      pubkeyField: this.pubkeyField.toString(),
-      vecField: this.vecField.map((item) => item.toString()),
-      vecStructField: this.vecStructField.map((item) => item.toJSON()),
-      optionField: this.optionField,
+      boolField: data.boolField,
+      u8Field: data.u8Field,
+      i8Field: data.i8Field,
+      u16Field: data.u16Field,
+      i16Field: data.i16Field,
+      u32Field: data.u32Field,
+      i32Field: data.i32Field,
+      f32Field: data.f32Field,
+      u64Field: data.u64Field.toString(),
+      i64Field: data.i64Field.toString(),
+      f64Field: data.f64Field,
+      u128Field: data.u128Field.toString(),
+      i128Field: data.i128Field.toString(),
+      bytesField: Array.from(data.bytesField.values()),
+      stringField: data.stringField,
+      pubkeyField: data.pubkeyField.toString(),
+      vecField: data.vecField.map((item) => item.toString()),
+      vecStructField: data.vecStructField.map((item) => item.toJSON()),
+      optionField: data.optionField,
       optionStructField:
-        (this.optionStructField && this.optionStructField.toJSON()) || null,
-      structField: this.structField.toJSON(),
-      arrayField: this.arrayField,
-      enumField1: this.enumField1.toJSON(),
-      enumField2: this.enumField2.toJSON(),
-      enumField3: this.enumField3.toJSON(),
-      enumField4: this.enumField4.toJSON(),
+        (data.optionStructField && data.optionStructField.toJSON()) || null,
+      structField: data.structField.toJSON(),
+      arrayField: data.arrayField,
+      enumField1: data.enumField1.toJSON(),
+      enumField2: data.enumField2.toJSON(),
+      enumField3: data.enumField3.toJSON(),
+      enumField4: data.enumField4.toJSON(),
     }
+  }
+
+  toJSON(): StateAccountJSON {
+    return State.toJSON(this.data)
   }
 
   static fromJSON(obj: StateAccountJSON): State {

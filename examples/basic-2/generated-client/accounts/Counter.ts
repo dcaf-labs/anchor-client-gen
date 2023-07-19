@@ -14,8 +14,7 @@ export interface CounterAccountJSON {
 }
 
 export class Counter {
-  readonly authority: PublicKey
-  readonly count: bigint
+  readonly data: CounterAccount
 
   static readonly discriminator = Buffer.from([
     255, 176, 4, 245, 188, 253, 124, 25,
@@ -27,13 +26,19 @@ export class Counter {
   ])
 
   constructor(accountData: CounterAccount) {
-    this.authority = accountData.authority
-    this.count = accountData.count
+    this.data = {
+      authority: accountData.authority,
+      count: accountData.count,
+    }
+  }
+
+  static isDiscriminatorEqual(data: Buffer): boolean {
+    return data.subarray(0, 8).equals(Counter.discriminator)
   }
 
   static decode(data: Buffer): Counter {
-    if (!data.subarray(0, 8).equals(Counter.discriminator)) {
-      throw new Error("invalid account discriminator")
+    if (!Counter.isDiscriminatorEqual(data)) {
+      throw new Error("Invalid account discriminator.")
     }
 
     const dec = Counter.layout.decode(data.subarray(8))
@@ -55,7 +60,7 @@ export class Counter {
       return null
     }
     if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
+      throw new Error("Account doesn't belong to this program.")
     }
     return this.decode(info.data)
   }
@@ -65,7 +70,7 @@ export class Counter {
     address: PublicKey,
     programId: PublicKey,
     getAccountInfoConfig?: GetAccountInfoConfig,
-    notFoundError: Error = new Error("Account with address not found")
+    notFoundError: Error = new Error("Account with address not found.")
   ): Promise<Counter> {
     const account = await Counter.fetch(
       c,
@@ -79,11 +84,15 @@ export class Counter {
     return account
   }
 
-  toJSON(): CounterAccountJSON {
+  static toJSON(data: CounterAccount): CounterAccountJSON {
     return {
-      authority: this.authority.toString(),
-      count: this.count.toString(),
+      authority: data.authority.toString(),
+      count: data.count.toString(),
     }
+  }
+
+  toJSON(): CounterAccountJSON {
+    return Counter.toJSON(this.data)
   }
 
   static fromJSON(obj: CounterAccountJSON): Counter {

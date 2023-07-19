@@ -376,7 +376,7 @@ export function fieldFromDecoded(
         if (mapBody === "item") {
           return `${valPrefix}${ty.name}`
         }
-        return `${valPrefix}${ty.name}.map((item: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ${mapBody})`
+        return `${valPrefix}${ty.name}.map((item: any) => ${mapBody})`
       }
       if (isComplexType(ty.type) && "option" in ty.type) {
         const decoded = fieldFromDecoded(
@@ -424,7 +424,7 @@ export function fieldFromDecoded(
         if (mapBody === "item") {
           return `${valPrefix}${ty.name}`
         }
-        return `${valPrefix}${ty.name}.map((item: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ${mapBody})`
+        return `${valPrefix}${ty.name}.map((item: any) => ${mapBody})`
       }
 
       unreachable(ty.type)

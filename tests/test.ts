@@ -643,39 +643,47 @@ it("toJSON", async () => {
    */
   const stateFromJSON = State.fromJSON(stateJSON)
 
-  expect(stateFromJSON.boolField).toBe(state.boolField)
-  expect(stateFromJSON.u8Field).toBe(state.u8Field)
-  expect(stateFromJSON.i8Field).toBe(state.i8Field)
-  expect(stateFromJSON.u16Field).toBe(state.u16Field)
-  expect(stateFromJSON.i16Field).toBe(state.i16Field)
-  expect(stateFromJSON.u32Field).toBe(state.u32Field)
-  expect(stateFromJSON.i32Field).toBe(state.i32Field)
-  expect(stateFromJSON.f32Field).toBe(state.f32Field)
-  expect(stateFromJSON.u64Field.toString()).toBe(state.u64Field.toString())
-  expect(stateFromJSON.i64Field.toString()).toBe(state.i64Field.toString())
-  expect(stateFromJSON.f64Field).toBe(state.f64Field)
-  expect(stateFromJSON.u128Field.toString()).toBe(state.u128Field.toString())
-  expect(stateFromJSON.i128Field.toString()).toBe(state.i128Field.toString())
-  expect(stateFromJSON.bytesField).toStrictEqual(state.bytesField)
-  expect(stateFromJSON.stringField).toBe(state.stringField)
-  expect(stateFromJSON.pubkeyField.toString()).toBe(
-    state.pubkeyField.toString()
+  expect(stateFromJSON.data.boolField).toBe(state.data.boolField)
+  expect(stateFromJSON.data.u8Field).toBe(state.data.u8Field)
+  expect(stateFromJSON.data.i8Field).toBe(state.data.i8Field)
+  expect(stateFromJSON.data.u16Field).toBe(state.data.u16Field)
+  expect(stateFromJSON.data.i16Field).toBe(state.data.i16Field)
+  expect(stateFromJSON.data.u32Field).toBe(state.data.u32Field)
+  expect(stateFromJSON.data.i32Field).toBe(state.data.i32Field)
+  expect(stateFromJSON.data.f32Field).toBe(state.data.f32Field)
+  expect(stateFromJSON.data.u64Field.toString()).toBe(
+    state.data.u64Field.toString()
+  )
+  expect(stateFromJSON.data.i64Field.toString()).toBe(
+    state.data.i64Field.toString()
+  )
+  expect(stateFromJSON.data.f64Field).toBe(state.data.f64Field)
+  expect(stateFromJSON.data.u128Field.toString()).toBe(
+    state.data.u128Field.toString()
+  )
+  expect(stateFromJSON.data.i128Field.toString()).toBe(
+    state.data.i128Field.toString()
+  )
+  expect(stateFromJSON.data.bytesField).toStrictEqual(state.data.bytesField)
+  expect(stateFromJSON.data.stringField).toBe(state.data.stringField)
+  expect(stateFromJSON.data.pubkeyField.toString()).toBe(
+    state.data.pubkeyField.toString()
   )
 
   // vecField
-  expect(stateFromJSON.vecField.length).toBe(2)
-  expect(stateFromJSON.vecField[0].toString()).toBe(
-    state.vecField[0].toString()
+  expect(stateFromJSON.data.vecField.length).toBe(2)
+  expect(stateFromJSON.data.vecField[0].toString()).toBe(
+    state.data.vecField[0].toString()
   )
-  expect(stateFromJSON.vecField[1].toString()).toBe(
-    state.vecField[1].toString()
+  expect(stateFromJSON.data.vecField[1].toString()).toBe(
+    state.data.vecField[1].toString()
   )
 
   // vecStructField
-  expect(stateFromJSON.vecStructField.length).toBe(1)
+  expect(stateFromJSON.data.vecStructField.length).toBe(1)
   {
-    const act = stateFromJSON.vecStructField[0]
-    const exp = state.vecStructField[0]
+    const act = stateFromJSON.data.vecStructField[0]
+    const exp = state.data.vecStructField[0]
 
     expect(act.field1).toBe(exp.field1)
     expect(act.field2).toBe(exp.field2)
@@ -708,12 +716,12 @@ it("toJSON", async () => {
   }
 
   // optionField
-  expect(stateFromJSON.optionField).toBe(state.optionField)
+  expect(stateFromJSON.data.optionField).toBe(state.data.optionField)
 
   // optionStructField
   {
-    const act = stateFromJSON.optionStructField
-    const exp = state.optionStructField
+    const act = stateFromJSON.data.optionStructField
+    const exp = state.data.optionStructField
 
     if (exp === null || act === null) {
       throw new Error()
@@ -742,8 +750,8 @@ it("toJSON", async () => {
 
   // structField
   {
-    const act = stateFromJSON.structField
-    const exp = state.structField
+    const act = stateFromJSON.data.structField
+    const exp = state.data.structField
 
     if (exp === null || act === null) {
       throw new Error()
@@ -768,12 +776,12 @@ it("toJSON", async () => {
   }
 
   // arrayField
-  expect(stateFromJSON.arrayField).toStrictEqual(state.arrayField)
+  expect(stateFromJSON.data.arrayField).toStrictEqual(state.data.arrayField)
 
   // enumField1
   {
-    const act = stateFromJSON.enumField1
-    const exp = state.enumField1
+    const act = stateFromJSON.data.enumField1
+    const exp = state.data.enumField1
 
     if (act.discriminator !== 0 || exp.discriminator !== 0) {
       throw new Error()
@@ -788,8 +796,8 @@ it("toJSON", async () => {
 
   // enumField2
   {
-    const act = stateFromJSON.enumField2
-    const exp = state.enumField2
+    const act = stateFromJSON.data.enumField2
+    const exp = state.data.enumField2
 
     if (act.discriminator !== 2 || exp.discriminator !== 2) {
       throw new Error()
@@ -803,8 +811,8 @@ it("toJSON", async () => {
 
   // enumField3
   {
-    const act = stateFromJSON.enumField3
-    const exp = state.enumField3
+    const act = stateFromJSON.data.enumField3
+    const exp = state.data.enumField3
 
     if (act.discriminator !== 3 || exp.discriminator !== 3) {
       throw new Error()
@@ -817,7 +825,7 @@ it("toJSON", async () => {
 
   // enumField4
   {
-    const act = stateFromJSON.enumField4
+    const act = stateFromJSON.data.enumField4
     if (act.discriminator !== 6) {
       throw new Error()
     }
