@@ -12,6 +12,7 @@ import {
   structFieldInitializer,
   tsTypeFromIdl,
 } from "./common"
+import { IdlAccountDef } from "@coral-xyz/anchor/dist/cjs/idl"
 
 export function genAccounts(
   project: Project,
@@ -58,7 +59,7 @@ function genAccountFiles(
   idl: Idl,
   outPath: (path: string) => string
 ) {
-  idl.accounts?.forEach((acc) => {
+  idl.accounts?.forEach((acc: IdlAccountDef) => {
     const src = project.createSourceFile(
       outPath(`accounts/${acc.name}.ts`),
       "",
@@ -72,7 +73,7 @@ function genAccountFiles(
     // imports
     src.addStatements([
       `/* eslint-disable */`,
-      `import { PublicKey, Connection } from "@solana/web3.js"`,
+      `import { PublicKey, Connection, GetAccountInfoConfig } from "@solana/web3.js"`,
       `import * as borsh from "@coral-xyz/borsh"`,
       ...(idl.types && idl.types.length > 0
         ? [`import * as types from "../types"`]
@@ -120,7 +121,7 @@ function genAccountFiles(
           docs: field.docs && [field.docs.join("\n")],
         }
       }),
-      docs: (acc as any).docs && [(acc as any).docs.join("\n")],
+      docs: acc.docs && [acc.docs.join("\n")],
     })
 
     // discriminator
@@ -155,60 +156,20 @@ function genAccountFiles(
     cls.addConstructor({
       parameters: [
         {
-          name: "fields",
+          name: "accountData",
           type: accountInterface.getName(),
         },
       ],
       statements: (writer) => {
         fields.forEach((field) => {
-          const initializer = structFieldInitializer(idl, field)
+          const initializer = structFieldInitializer(idl, field, "accountData.")
           writer.writeLine(`this.${field.name} = ${initializer}`)
         })
       },
     })
 
-    // fetch
-    cls.addMethod({
-      isStatic: true,
-      isAsync: true,
-      name: "fetch",
-      parameters: [
-        {
-          name: "c",
-          type: "Connection",
-        },
-        {
-          name: "address",
-          type: "PublicKey",
-        },
-        {
-          name: "programId",
-          type: "PublicKey",
-        },
-      ],
-      returnType: `Promise<${name} | null>`,
-      statements: [
-        (writer) => {
-          writer.writeLine("const info = await c.getAccountInfo(address)")
-          writer.blankLine()
-          writer.write("if (info === null)")
-          writer.inlineBlock(() => {
-            writer.writeLine("return null")
-          })
-          writer.write("if (!info.owner.equals(programId))")
-          writer.inlineBlock(() => {
-            writer.writeLine(
-              `throw new Error("account doesn't belong to this program")`
-            )
-          })
-          writer.blankLine()
-          writer.writeLine("return this.decode(info.data)")
-        },
-      ],
-    })
-
     // decode
-    cls.addMethod({
+    const decode = cls.addMethod({
       isStatic: true,
       name: "decode",
       parameters: [
@@ -238,6 +199,94 @@ function genAccountFiles(
             writer.writeLine(`${field.name}: ${decoded},`)
           })
           writer.write("})")
+        },
+      ],
+    })
+
+    // fetch
+    const fetch = cls.addMethod({
+      isStatic: true,
+      isAsync: true,
+      name: "fetch",
+      parameters: [
+        {
+          name: "c",
+          type: "Connection",
+        },
+        {
+          name: "address",
+          type: "PublicKey",
+        },
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
+          name: "getAccountInfoConfig",
+          type: "GetAccountInfoConfig",
+          hasQuestionToken: true,
+        },
+      ],
+      returnType: `Promise<${name} | null>`,
+      statements: [
+        (writer) => {
+          writer.writeLine(
+            "const info = await c.getAccountInfo(address, getAccountInfoConfig)"
+          )
+          writer.write("if (info === null)")
+          writer.inlineBlock(() => {
+            writer.writeLine("return null")
+          })
+          writer.write("if (!info.owner.equals(programId))")
+          writer.inlineBlock(() => {
+            writer.writeLine(
+              `throw new Error("account doesn't belong to this program")`
+            )
+          })
+          writer.writeLine(`return this.${decode.getName()}(info.data)`)
+        },
+      ],
+    })
+
+    const fetchNonNullable = cls.addMethod({
+      isStatic: true,
+      isAsync: true,
+      name: "fetchNonNullable",
+      parameters: [
+        {
+          name: "c",
+          type: "Connection",
+        },
+        {
+          name: "address",
+          type: "PublicKey",
+        },
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
+          name: "getAccountInfoConfig",
+          type: "GetAccountInfoConfig",
+          hasQuestionToken: true,
+        },
+        {
+          name: "notFoundError",
+          type: "Error",
+          initializer: `new Error("Account with address not found")`,
+        },
+      ],
+      returnType: `Promise<${name}>`,
+      statements: [
+        (writer) => {
+          writer.writeLine(
+            `const account = await ${cls.getName()}.${fetch.getName()}(c, address, programId, getAccountInfoConfig)`
+          )
+          writer.write("if (!account)")
+          writer.inlineBlock(() => {
+            writer.writeLine("throw notFoundError")
+          })
+          writer.writeLine(`return account`)
         },
       ],
     })

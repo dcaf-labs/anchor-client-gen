@@ -1,6 +1,6 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 /* eslint-disable */
-import { PublicKey, Connection } from "@solana/web3.js"
+import { PublicKey, Connection, GetAccountInfoConfig } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
@@ -35,28 +35,11 @@ export class Game {
     types.GameState.layout("state"),
   ])
 
-  constructor(fields: GameAccount) {
-    this.players = fields.players
-    this.turn = fields.turn
-    this.board = fields.board
-    this.state = fields.state
-  }
-
-  static async fetch(
-    c: Connection,
-    address: PublicKey,
-    programId: PublicKey
-  ): Promise<Game | null> {
-    const info = await c.getAccountInfo(address)
-
-    if (info === null) {
-      return null
-    }
-    if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
-    }
-
-    return this.decode(info.data)
+  constructor(accountData: GameAccount) {
+    this.players = accountData.players
+    this.turn = accountData.turn
+    this.board = accountData.board
+    this.state = accountData.state
   }
 
   static decode(data: Buffer): Game {
@@ -81,6 +64,41 @@ export class Game {
       ),
       state: types.GameState.fromDecoded(dec.state),
     })
+  }
+
+  static async fetch(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig
+  ): Promise<Game | null> {
+    const info = await c.getAccountInfo(address, getAccountInfoConfig)
+    if (info === null) {
+      return null
+    }
+    if (!info.owner.equals(programId)) {
+      throw new Error("account doesn't belong to this program")
+    }
+    return this.decode(info.data)
+  }
+
+  static async fetchNonNullable(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found")
+  ): Promise<Game> {
+    const account = await Game.fetch(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig
+    )
+    if (!account) {
+      throw notFoundError
+    }
+    return account
   }
 
   toJSON(): GameAccountJSON {

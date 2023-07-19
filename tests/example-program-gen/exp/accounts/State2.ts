@@ -1,6 +1,6 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 /* eslint-disable */
-import { PublicKey, Connection } from "@solana/web3.js"
+import { PublicKey, Connection, GetAccountInfoConfig } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
@@ -23,25 +23,8 @@ export class State2 {
     borsh.vec(borsh.option(borsh.u64()), "vecOfOption"),
   ])
 
-  constructor(fields: State2Account) {
-    this.vecOfOption = fields.vecOfOption
-  }
-
-  static async fetch(
-    c: Connection,
-    address: PublicKey,
-    programId: PublicKey
-  ): Promise<State2 | null> {
-    const info = await c.getAccountInfo(address)
-
-    if (info === null) {
-      return null
-    }
-    if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
-    }
-
-    return this.decode(info.data)
+  constructor(accountData: State2Account) {
+    this.vecOfOption = accountData.vecOfOption
   }
 
   static decode(data: Buffer): State2 {
@@ -54,6 +37,41 @@ export class State2 {
     return new State2({
       vecOfOption: dec.vecOfOption,
     })
+  }
+
+  static async fetch(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig
+  ): Promise<State2 | null> {
+    const info = await c.getAccountInfo(address, getAccountInfoConfig)
+    if (info === null) {
+      return null
+    }
+    if (!info.owner.equals(programId)) {
+      throw new Error("account doesn't belong to this program")
+    }
+    return this.decode(info.data)
+  }
+
+  static async fetchNonNullable(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found")
+  ): Promise<State2> {
+    const account = await State2.fetch(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig
+    )
+    if (!account) {
+      throw notFoundError
+    }
+    return account
   }
 
   toJSON(): State2AccountJSON {

@@ -1,6 +1,6 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 /* eslint-disable */
-import { PublicKey, Connection } from "@solana/web3.js"
+import { PublicKey, Connection, GetAccountInfoConfig } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 import * as types from "../types"
 
@@ -127,55 +127,38 @@ export class State {
     types.FooEnum.layout("enumField4"),
   ])
 
-  constructor(fields: StateAccount) {
-    this.boolField = fields.boolField
-    this.u8Field = fields.u8Field
-    this.i8Field = fields.i8Field
-    this.u16Field = fields.u16Field
-    this.i16Field = fields.i16Field
-    this.u32Field = fields.u32Field
-    this.i32Field = fields.i32Field
-    this.f32Field = fields.f32Field
-    this.u64Field = fields.u64Field
-    this.i64Field = fields.i64Field
-    this.f64Field = fields.f64Field
-    this.u128Field = fields.u128Field
-    this.i128Field = fields.i128Field
-    this.bytesField = fields.bytesField
-    this.stringField = fields.stringField
-    this.pubkeyField = fields.pubkeyField
-    this.vecField = fields.vecField
-    this.vecStructField = fields.vecStructField.map(
+  constructor(accountData: StateAccount) {
+    this.boolField = accountData.boolField
+    this.u8Field = accountData.u8Field
+    this.i8Field = accountData.i8Field
+    this.u16Field = accountData.u16Field
+    this.i16Field = accountData.i16Field
+    this.u32Field = accountData.u32Field
+    this.i32Field = accountData.i32Field
+    this.f32Field = accountData.f32Field
+    this.u64Field = accountData.u64Field
+    this.i64Field = accountData.i64Field
+    this.f64Field = accountData.f64Field
+    this.u128Field = accountData.u128Field
+    this.i128Field = accountData.i128Field
+    this.bytesField = accountData.bytesField
+    this.stringField = accountData.stringField
+    this.pubkeyField = accountData.pubkeyField
+    this.vecField = accountData.vecField
+    this.vecStructField = accountData.vecStructField.map(
       (item) => new types.FooStruct({ ...item })
     )
-    this.optionField = fields.optionField
+    this.optionField = accountData.optionField
     this.optionStructField =
-      (fields.optionStructField &&
-        new types.FooStruct({ ...fields.optionStructField })) ||
+      (accountData.optionStructField &&
+        new types.FooStruct({ ...accountData.optionStructField })) ||
       null
-    this.structField = new types.FooStruct({ ...fields.structField })
-    this.arrayField = fields.arrayField
-    this.enumField1 = fields.enumField1
-    this.enumField2 = fields.enumField2
-    this.enumField3 = fields.enumField3
-    this.enumField4 = fields.enumField4
-  }
-
-  static async fetch(
-    c: Connection,
-    address: PublicKey,
-    programId: PublicKey
-  ): Promise<State | null> {
-    const info = await c.getAccountInfo(address)
-
-    if (info === null) {
-      return null
-    }
-    if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
-    }
-
-    return this.decode(info.data)
+    this.structField = new types.FooStruct({ ...accountData.structField })
+    this.arrayField = accountData.arrayField
+    this.enumField1 = accountData.enumField1
+    this.enumField2 = accountData.enumField2
+    this.enumField3 = accountData.enumField3
+    this.enumField4 = accountData.enumField4
   }
 
   static decode(data: Buffer): State {
@@ -224,6 +207,41 @@ export class State {
       enumField3: types.FooEnum.fromDecoded(dec.enumField3),
       enumField4: types.FooEnum.fromDecoded(dec.enumField4),
     })
+  }
+
+  static async fetch(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig
+  ): Promise<State | null> {
+    const info = await c.getAccountInfo(address, getAccountInfoConfig)
+    if (info === null) {
+      return null
+    }
+    if (!info.owner.equals(programId)) {
+      throw new Error("account doesn't belong to this program")
+    }
+    return this.decode(info.data)
+  }
+
+  static async fetchNonNullable(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found")
+  ): Promise<State> {
+    const account = await State.fetch(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig
+    )
+    if (!account) {
+      throw notFoundError
+    }
+    return account
   }
 
   toJSON(): StateAccountJSON {

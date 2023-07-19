@@ -1,6 +1,6 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 /* eslint-disable */
-import { PublicKey, Connection } from "@solana/web3.js"
+import { PublicKey, Connection, GetAccountInfoConfig } from "@solana/web3.js"
 import * as borsh from "@coral-xyz/borsh"
 
 export interface CounterAccount {
@@ -26,26 +26,9 @@ export class Counter {
     borsh.u64("count"),
   ])
 
-  constructor(fields: CounterAccount) {
-    this.authority = fields.authority
-    this.count = fields.count
-  }
-
-  static async fetch(
-    c: Connection,
-    address: PublicKey,
-    programId: PublicKey
-  ): Promise<Counter | null> {
-    const info = await c.getAccountInfo(address)
-
-    if (info === null) {
-      return null
-    }
-    if (!info.owner.equals(programId)) {
-      throw new Error("account doesn't belong to this program")
-    }
-
-    return this.decode(info.data)
+  constructor(accountData: CounterAccount) {
+    this.authority = accountData.authority
+    this.count = accountData.count
   }
 
   static decode(data: Buffer): Counter {
@@ -59,6 +42,41 @@ export class Counter {
       authority: dec.authority,
       count: dec.count,
     })
+  }
+
+  static async fetch(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig
+  ): Promise<Counter | null> {
+    const info = await c.getAccountInfo(address, getAccountInfoConfig)
+    if (info === null) {
+      return null
+    }
+    if (!info.owner.equals(programId)) {
+      throw new Error("account doesn't belong to this program")
+    }
+    return this.decode(info.data)
+  }
+
+  static async fetchNonNullable(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found")
+  ): Promise<Counter> {
+    const account = await Counter.fetch(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig
+    )
+    if (!account) {
+      throw notFoundError
+    }
+    return account
   }
 
   toJSON(): CounterAccountJSON {
