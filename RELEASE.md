@@ -15,6 +15,7 @@ Latest:
 Beta:
 
 - Update the version outputted by `--version` flag in `src/main.ts` to match the above
+- Update package.json with the new version
 - Run `yarn build` and `yarn test`
 - Publish the beta version `yarn npm publish --tag beta` (optionally do a dry run with `--dry-run`)
 - Commit the changes to git

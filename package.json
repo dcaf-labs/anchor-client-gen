@@ -1,7 +1,7 @@
 {
   "name": "@dcaf/anchor-client-gen",
   "description": "A tool for generating solana web3 clients from anchor IDLs.",
-  "version": "0.28.1-beta.3",
+  "version": "0.28.1-beta.4",
   "bin": "dist/main.js",
   "license": "MIT",
   "homepage": "https://github.com/dcaf-labs/anchor-client-gen",
