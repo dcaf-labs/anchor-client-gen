@@ -552,6 +552,7 @@ function genInstructionFiles(
         (writer) => {
           if (!accountsInterfaceJSON) {
             writer.writeLine("return null")
+            return
           }
           function recurseAccounts(
             accs: IdlAccountItem[],

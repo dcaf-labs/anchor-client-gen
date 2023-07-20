@@ -51,7 +51,6 @@ export class CauseError {
 
   toAccountsJSON(): null {
     return null
-    return {}
   }
 
   toJSON(): CauseErrorInstructionJSON {
