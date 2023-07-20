@@ -319,6 +319,82 @@ function genAccountFiles(
       ],
     })
 
+    const fetchNullableData = cls.addMethod({
+      isStatic: true,
+      isAsync: true,
+      name: "fetchNullableData",
+      parameters: [
+        {
+          name: "c",
+          type: "Connection",
+        },
+        {
+          name: "address",
+          type: "PublicKey",
+        },
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
+          name: "getAccountInfoConfig",
+          type: "GetAccountInfoConfig",
+          hasQuestionToken: true,
+        },
+        {
+          name: "notFoundError",
+          type: "Error",
+          initializer: `new Error("Account with address not found.")`,
+        },
+      ],
+      returnType: `Promise<${accountInterface.getName()} | null>`,
+      statements: [
+        (writer) => {
+          writer.writeLine(
+            `return await ${cls.getName()}.${fetchNonNullable.getName()}(c, address, programId, getAccountInfoConfig, notFoundError).then((a) => a?.data)`
+          )
+        },
+      ],
+    })
+
+    const fetchNonNullableData = cls.addMethod({
+      isStatic: true,
+      isAsync: true,
+      name: "fetchNonNullableData",
+      parameters: [
+        {
+          name: "c",
+          type: "Connection",
+        },
+        {
+          name: "address",
+          type: "PublicKey",
+        },
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
+          name: "getAccountInfoConfig",
+          type: "GetAccountInfoConfig",
+          hasQuestionToken: true,
+        },
+        {
+          name: "notFoundError",
+          type: "Error",
+          initializer: `new Error("Account with address not found.")`,
+        },
+      ],
+      returnType: `Promise<${accountInterface.getName()}>`,
+      statements: [
+        (writer) => {
+          writer.writeLine(
+            `return await ${cls.getName()}.${fetchNonNullable.getName()}(c, address, programId, getAccountInfoConfig, notFoundError).then((a) => a.data)`
+          )
+        },
+      ],
+    })
+
     // toJSON
     const staticToJSON = cls.addMethod({
       isStatic: true,

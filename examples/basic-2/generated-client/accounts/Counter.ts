@@ -84,6 +84,38 @@ export class Counter {
     return account
   }
 
+  static async fetchNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<CounterAccount | null> {
+    return await Counter.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a?.data)
+  }
+
+  static async fetchNonNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<CounterAccount> {
+    return await Counter.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a.data)
+  }
+
   static toJSON(data: CounterAccount): CounterAccountJSON {
     // convert fields to classes if needed
     const account = {

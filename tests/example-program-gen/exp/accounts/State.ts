@@ -222,6 +222,38 @@ export class State {
     return account
   }
 
+  static async fetchNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<StateAccount | null> {
+    return await State.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a?.data)
+  }
+
+  static async fetchNonNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<StateAccount> {
+    return await State.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a.data)
+  }
+
   static toJSON(data: StateAccount): StateAccountJSON {
     // convert fields to classes if needed
     const account = {

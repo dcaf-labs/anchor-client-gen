@@ -97,6 +97,38 @@ export class Game {
     return account
   }
 
+  static async fetchNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<GameAccount | null> {
+    return await Game.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a?.data)
+  }
+
+  static async fetchNonNullableData(
+    c: Connection,
+    address: PublicKey,
+    programId: PublicKey,
+    getAccountInfoConfig?: GetAccountInfoConfig,
+    notFoundError: Error = new Error("Account with address not found.")
+  ): Promise<GameAccount> {
+    return await Game.fetchNonNullable(
+      c,
+      address,
+      programId,
+      getAccountInfoConfig,
+      notFoundError
+    ).then((a) => a.data)
+  }
+
   static toJSON(data: GameAccount): GameAccountJSON {
     // convert fields to classes if needed
     const account = {
