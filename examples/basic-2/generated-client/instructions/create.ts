@@ -57,6 +57,43 @@ export class Create {
     return new Create({ args, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.counter,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.user,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        authority: this.instructionData.args.authority,
+      },
+      buffer
+    )
+    const data = Buffer.concat([Create.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): CreateArgsJSON {
     const args = {
       authority: this.instructionData.args.authority,

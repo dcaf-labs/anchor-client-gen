@@ -74,6 +74,26 @@ export class FooStruct {
     })
   }
 
+  static toEncodable(fields: FooStructFields) {
+    return {
+      field1: fields.field1,
+      field2: fields.field2,
+      nested: types.BarStruct.toEncodable(fields.nested),
+      vecNested: fields.vecNested.map((item) =>
+        types.BarStruct.toEncodable(item)
+      ),
+      optionNested:
+        (fields.optionNested &&
+          types.BarStruct.toEncodable(fields.optionNested)) ||
+        null,
+      enumField: fields.enumField.toEncodable(),
+    }
+  }
+
+  toEncodable() {
+    return FooStruct.toEncodable(this)
+  }
+
   toJSON(): FooStructJSON {
     return {
       field1: this.field1,

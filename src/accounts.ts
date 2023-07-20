@@ -113,14 +113,6 @@ function genAccountFiles(
     const cls = src.addClass({
       isExported: true,
       name: name,
-      // properties: fields.map((field) => {
-      //   return {
-      //     isReadonly: true,
-      //     name: field.name,
-      //     type: tsTypeFromIdl(idl, field.type, "types.", false),
-      //     docs: field.docs && [field.docs.join("\n")],
-      //   }
-      // }),
       properties: [
         {
           isReadonly: true,

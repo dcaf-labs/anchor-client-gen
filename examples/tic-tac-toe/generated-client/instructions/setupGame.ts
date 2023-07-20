@@ -61,6 +61,43 @@ export class SetupGame {
     return new SetupGame({ args, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.game,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.playerOne,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        playerTwo: this.instructionData.args.playerTwo,
+      },
+      buffer
+    )
+    const data = Buffer.concat([SetupGame.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): SetupGameArgsJSON {
     const args = {
       playerTwo: this.instructionData.args.playerTwo,

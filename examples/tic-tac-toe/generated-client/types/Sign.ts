@@ -19,6 +19,12 @@ export class X {
       kind: "X",
     }
   }
+
+  toEncodable() {
+    return {
+      X: {},
+    }
+  }
 }
 
 export interface OJSON {
@@ -34,6 +40,12 @@ export class O {
   toJSON(): OJSON {
     return {
       kind: "O",
+    }
+  }
+
+  toEncodable() {
+    return {
+      O: {},
     }
   }
 }

@@ -64,6 +64,46 @@ export class Initialize {
     return new Initialize({ args: null, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.state,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.nested.clock,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: this.instructionData.accounts.nested.rent,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: this.instructionData.accounts.payer,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const data = Initialize.identifier
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): null {
     return null
   }

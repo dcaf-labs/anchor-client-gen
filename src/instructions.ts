@@ -6,6 +6,7 @@ import {
   VariableDeclarationKind,
 } from "ts-morph"
 import {
+  fieldToEncodable,
   fieldToJSON,
   genIxIdentifier,
   idlTypeToJSONType,
@@ -386,11 +387,130 @@ function genInstructionFiles(
         ],
       })
     }
+
+    // toAccountMetas
+    const toAccountMetas = cls.addMethod({
+      name: "toAccountMetas",
+      returnType: "AccountMeta[]",
+      statements: [
+        (writer) => {
+          function recurseAccounts(
+            accs: IdlAccountItem[],
+            nestedNames: string[]
+          ) {
+            accs.forEach((item) => {
+              if ("accounts" in item) {
+                recurseAccounts(item.accounts, [...nestedNames, item.name])
+              } else {
+                // /** An account's public key */
+                // pubkey: PublicKey;
+                // /** True if an instruction requires a transaction signature matching `pubkey` */
+                // isSigner: boolean;
+                // /** True if the `pubkey` can be loaded as a read-write account. */
+                // isWritable: boolean;
+                writer.writeLine("{")
+                writer.writeLine(
+                  `pubkey: this.instructionData.accounts.${[
+                    ...nestedNames,
+                    item.name,
+                  ].join(".")},`
+                )
+                writer.writeLine(`isSigner: ${item.isSigner},`)
+                writer.writeLine(`isWritable: ${item.isMut},`)
+                writer.writeLine("},")
+              }
+            })
+          }
+
+          writer.writeLine("return [")
+          recurseAccounts(ix.accounts, [])
+          writer.writeLine("]")
+        },
+      ],
+    })
+
     fromDecodedMethod.addStatements([
       `return new ${cls.getName()}({${argsInterface ? "args," : "args: null,"}${
         accountsInterface ? "accounts," : "accounts: null,"
       }})`,
     ])
+
+    // build
+    const buildMethod = cls.addMethod({
+      name: "build",
+      parameters: [
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+      ],
+    })
+    if (argsInterface) {
+      buildMethod.addVariableStatement({
+        declarationKind: VariableDeclarationKind.Const,
+        declarations: [
+          {
+            name: "buffer",
+            initializer: "Buffer.alloc(1000)", // TODO: use a tighter buffer.
+          },
+        ],
+      })
+      buildMethod.addVariableStatement({
+        declarationKind: VariableDeclarationKind.Const,
+        declarations: [
+          {
+            name: "len",
+            initializer: (writer) => {
+              writer.write("layout.encode({")
+
+              ix.args.forEach((arg) => {
+                writer.writeLine(
+                  `${arg.name}: ${fieldToEncodable(
+                    idl,
+                    arg,
+                    "this.instructionData.args."
+                  )},`
+                )
+              })
+
+              writer.write("}, buffer)")
+            },
+          },
+        ],
+      })
+      buildMethod.addVariableStatement({
+        declarationKind: VariableDeclarationKind.Const,
+        declarations: [
+          {
+            name: "data",
+            initializer: `Buffer.concat([${cls.getName()}.identifier, buffer]).slice(0, 8 + len)`,
+          },
+        ],
+      })
+    } else {
+      buildMethod.addVariableStatement({
+        declarationKind: VariableDeclarationKind.Const,
+        declarations: [
+          {
+            name: "data",
+            initializer: `${cls.getName()}.identifier`,
+          },
+        ],
+      })
+    }
+
+    // ret
+    buildMethod.addVariableStatement({
+      declarationKind: VariableDeclarationKind.Const,
+      declarations: [
+        {
+          name: "ix",
+          initializer: `new TransactionInstruction({ keys: this.${toAccountMetas.getName()}(), programId: programId, data })`,
+        },
+      ],
+    })
+
+    buildMethod.addStatements("return ix")
 
     // toJSON
     const toArgsJSON = cls.addMethod({

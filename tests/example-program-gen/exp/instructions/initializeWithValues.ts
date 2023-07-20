@@ -155,6 +155,96 @@ export class InitializeWithValues {
     return new InitializeWithValues({ args, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.state,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.nested.clock,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: this.instructionData.accounts.nested.rent,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: this.instructionData.accounts.payer,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        boolField: this.instructionData.args.boolField,
+        u8Field: this.instructionData.args.u8Field,
+        i8Field: this.instructionData.args.i8Field,
+        u16Field: this.instructionData.args.u16Field,
+        i16Field: this.instructionData.args.i16Field,
+        u32Field: this.instructionData.args.u32Field,
+        i32Field: this.instructionData.args.i32Field,
+        f32Field: this.instructionData.args.f32Field,
+        u64Field: new BN(this.instructionData.args.u64Field.toString()),
+        i64Field: new BN(this.instructionData.args.i64Field.toString()),
+        f64Field: this.instructionData.args.f64Field,
+        u128Field: new BN(this.instructionData.args.u128Field.toString()),
+        i128Field: new BN(this.instructionData.args.i128Field.toString()),
+        bytesField: Buffer.from(
+          this.instructionData.args.bytesField.buffer,
+          this.instructionData.args.bytesField.byteOffset,
+          this.instructionData.args.bytesField.length
+        ),
+        stringField: this.instructionData.args.stringField,
+        pubkeyField: this.instructionData.args.pubkeyField,
+        vecField: this.instructionData.args.vecField.map(
+          (item) => new BN(item.toString())
+        ),
+        vecStructField: this.instructionData.args.vecStructField.map((item) =>
+          types.FooStruct.toEncodable(item)
+        ),
+        optionField: this.instructionData.args.optionField,
+        optionStructField:
+          (this.instructionData.args.optionStructField &&
+            types.FooStruct.toEncodable(
+              this.instructionData.args.optionStructField
+            )) ||
+          null,
+        structField: types.FooStruct.toEncodable(
+          this.instructionData.args.structField
+        ),
+        arrayField: this.instructionData.args.arrayField,
+        enumField1: this.instructionData.args.enumField1.toEncodable(),
+        enumField2: this.instructionData.args.enumField2.toEncodable(),
+        enumField3: this.instructionData.args.enumField3.toEncodable(),
+        enumField4: this.instructionData.args.enumField4.toEncodable(),
+      },
+      buffer
+    )
+    const data = Buffer.concat([InitializeWithValues.identifier, buffer]).slice(
+      0,
+      8 + len
+    )
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): InitializeWithValuesArgsJSON {
     const args = {
       boolField: this.instructionData.args.boolField,

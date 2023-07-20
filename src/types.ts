@@ -15,6 +15,7 @@ import {
   jsonInterfaceName,
   idlTypeToJSONType,
   fieldFromJSON,
+  fieldToEncodable,
 } from "./common"
 
 export function genTypes(
@@ -136,7 +137,7 @@ function genStruct(
   ])
 
   // fields interface
-  src.addInterface({
+  const fieldsInterface = src.addInterface({
     isExported: true,
     name: fieldsInterfaceName(name),
     properties: fields.map((field) => {
@@ -149,7 +150,7 @@ function genStruct(
   })
 
   // json interface
-  src.addInterface({
+  const fieldsInterfaceJSON = src.addInterface({
     isExported: true,
     name: jsonInterfaceName(name),
     properties: fields.map((field) => {
@@ -238,6 +239,37 @@ function genStruct(
         writer.write("})")
       },
     ],
+  })
+
+  // static toEncodable
+  cls.addMethod({
+    isStatic: true,
+    name: "toEncodable",
+    parameters: [
+      {
+        name: "fields",
+        type: fieldsInterface.getName(),
+      },
+    ],
+    statements: [
+      (writer) => {
+        writer.write(`return {`)
+
+        fields.forEach((field) => {
+          writer.writeLine(
+            `${field.name}: ${fieldToEncodable(idl, field, "fields.")},`
+          )
+        })
+
+        writer.write("}")
+      },
+    ],
+  })
+
+  // toEncodable
+  cls.addMethod({
+    name: "toEncodable",
+    statements: [`return ${cls.getName()}.toEncodable(this)`],
   })
 
   // toJSON
@@ -543,6 +575,37 @@ function genEnum(
       name: "toJSON",
       returnType: jsonInterfaceName(variant.name),
       statements: [toJSONstmt],
+    })
+
+    // toEncodable
+    const toEncodableStmt: WriterFunction = (writer) => {
+      writer.write(`return`).inlineBlock(() => {
+        writer.writeLine(`${variant.name}: {`)
+
+        fields?.forEach((field, i) => {
+          if (typeof field === "object" && "name" in field) {
+            const encodable = fieldToEncodable(
+              idl,
+              { ...field, name: camelcase(field.name) },
+              "this.value."
+            )
+            writer.writeLine(`${field.name}: ${encodable},`)
+          } else {
+            const encodable = fieldToEncodable(
+              idl,
+              { type: field, name: `[${i}]` },
+              "this.value"
+            )
+            writer.writeLine(`_${i}: ${encodable},`)
+          }
+        })
+
+        writer.writeLine(`}`)
+      })
+    }
+    cls.addMethod({
+      name: "toEncodable",
+      statements: [toEncodableStmt],
     })
   })
 

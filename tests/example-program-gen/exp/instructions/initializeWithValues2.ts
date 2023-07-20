@@ -67,6 +67,48 @@ export class InitializeWithValues2 {
     return new InitializeWithValues2({ args, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.state,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.payer,
+        isSigner: true,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.systemProgram,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        vecOfOption: this.instructionData.args.vecOfOption.map(
+          (item) => (item && new BN(item.toString())) || null
+        ),
+      },
+      buffer
+    )
+    const data = Buffer.concat([
+      InitializeWithValues2.identifier,
+      buffer,
+    ]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): InitializeWithValues2ArgsJSON {
     const args = {
       vecOfOption: this.instructionData.args.vecOfOption,

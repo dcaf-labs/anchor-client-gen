@@ -31,6 +31,20 @@ export class CauseError {
     return new CauseError({ args: null, accounts: null })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return []
+  }
+
+  build(programId: PublicKey) {
+    const data = CauseError.identifier
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): null {
     return null
   }

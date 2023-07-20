@@ -35,6 +35,17 @@ export class Tile {
     })
   }
 
+  static toEncodable(fields: TileFields) {
+    return {
+      row: fields.row,
+      column: fields.column,
+    }
+  }
+
+  toEncodable() {
+    return Tile.toEncodable(this)
+  }
+
   toJSON(): TileJSON {
     return {
       row: this.row,

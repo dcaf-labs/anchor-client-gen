@@ -19,6 +19,12 @@ export class Active {
       kind: "Active",
     }
   }
+
+  toEncodable() {
+    return {
+      Active: {},
+    }
+  }
 }
 
 export interface TieJSON {
@@ -34,6 +40,12 @@ export class Tie {
   toJSON(): TieJSON {
     return {
       kind: "Tie",
+    }
+  }
+
+  toEncodable() {
+    return {
+      Tie: {},
     }
   }
 }
@@ -70,6 +82,14 @@ export class Won {
       kind: "Won",
       value: {
         winner: this.value.winner.toString(),
+      },
+    }
+  }
+
+  toEncodable() {
+    return {
+      Won: {
+        winner: this.value.winner,
       },
     }
   }

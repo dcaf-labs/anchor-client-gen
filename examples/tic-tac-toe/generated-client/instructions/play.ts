@@ -55,6 +55,38 @@ export class Play {
     return new Play({ args, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.game,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.player,
+        isSigner: true,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const buffer = Buffer.alloc(1000)
+    const len = layout.encode(
+      {
+        tile: types.Tile.toEncodable(this.instructionData.args.tile),
+      },
+      buffer
+    )
+    const data = Buffer.concat([Play.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): PlayArgsJSON {
     const args = {
       tile: new types.Tile({ ...this.instructionData.args.tile }),

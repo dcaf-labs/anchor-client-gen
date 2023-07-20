@@ -29,6 +29,16 @@ export class Unnamed {
       value: [this.value[0], this.value[1], this.value[2].toJSON()],
     }
   }
+
+  toEncodable() {
+    return {
+      Unnamed: {
+        _0: this.value[0],
+        _1: this.value[1],
+        _2: types.BarStruct.toEncodable(this.value[2]),
+      },
+    }
+  }
 }
 
 export type UnnamedSingleFields = [types.BarStructFields]
@@ -54,6 +64,14 @@ export class UnnamedSingle {
     return {
       kind: "UnnamedSingle",
       value: [this.value[0].toJSON()],
+    }
+  }
+
+  toEncodable() {
+    return {
+      UnnamedSingle: {
+        _0: types.BarStruct.toEncodable(this.value[0]),
+      },
     }
   }
 }
@@ -106,6 +124,16 @@ export class Named {
       },
     }
   }
+
+  toEncodable() {
+    return {
+      Named: {
+        bool_field: this.value.boolField,
+        u8_field: this.value.u8Field,
+        nested: types.BarStruct.toEncodable(this.value.nested),
+      },
+    }
+  }
 }
 
 export type StructFields = [types.BarStructFields]
@@ -131,6 +159,14 @@ export class Struct {
     return {
       kind: "Struct",
       value: [this.value[0].toJSON()],
+    }
+  }
+
+  toEncodable() {
+    return {
+      Struct: {
+        _0: types.BarStruct.toEncodable(this.value[0]),
+      },
     }
   }
 }
@@ -160,6 +196,15 @@ export class OptionStruct {
       value: [(this.value[0] && this.value[0].toJSON()) || null],
     }
   }
+
+  toEncodable() {
+    return {
+      OptionStruct: {
+        _0:
+          (this.value[0] && types.BarStruct.toEncodable(this.value[0])) || null,
+      },
+    }
+  }
 }
 
 export type VecStructFields = [Array<types.BarStructFields>]
@@ -187,6 +232,14 @@ export class VecStruct {
       value: [this.value[0].map((item) => item.toJSON())],
     }
   }
+
+  toEncodable() {
+    return {
+      VecStruct: {
+        _0: this.value[0].map((item) => types.BarStruct.toEncodable(item)),
+      },
+    }
+  }
 }
 
 export interface NoFieldsJSON {
@@ -202,6 +255,12 @@ export class NoFields {
   toJSON(): NoFieldsJSON {
     return {
       kind: "NoFields",
+    }
+  }
+
+  toEncodable() {
+    return {
+      NoFields: {},
     }
   }
 }

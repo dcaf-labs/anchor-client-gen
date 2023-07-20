@@ -42,6 +42,17 @@ export class BarStruct {
     })
   }
 
+  static toEncodable(fields: BarStructFields) {
+    return {
+      someField: fields.someField,
+      otherField: fields.otherField,
+    }
+  }
+
+  toEncodable() {
+    return BarStruct.toEncodable(this)
+  }
+
   toJSON(): BarStructJSON {
     return {
       someField: this.someField,

@@ -44,6 +44,31 @@ export class Increment {
     return new Increment({ args: null, accounts })
   }
 
+  toAccountMetas(): AccountMeta[] {
+    return [
+      {
+        pubkey: this.instructionData.accounts.counter,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: this.instructionData.accounts.authority,
+        isSigner: true,
+        isWritable: false,
+      },
+    ]
+  }
+
+  build(programId: PublicKey) {
+    const data = Increment.identifier
+    const ix = new TransactionInstruction({
+      keys: this.toAccountMetas(),
+      programId: programId,
+      data,
+    })
+    return ix
+  }
+
   toArgsJSON(): null {
     return null
   }
