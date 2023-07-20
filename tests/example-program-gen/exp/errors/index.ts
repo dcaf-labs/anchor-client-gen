@@ -2,6 +2,8 @@
 import { PublicKey } from "@solana/web3.js"
 import * as anchor from "./anchor"
 import * as custom from "./custom"
+export * as AnchorErrors from "./anchor"
+export * as CustomErrors from "./custom"
 
 export function fromCode(
   code: number,

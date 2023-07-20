@@ -1,6 +1,7 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey } from "@solana/web3.js"
 import * as anchor from "./anchor"
+export * as AnchorErrors from "./anchor"
 
 export function fromCode(
   code: number,

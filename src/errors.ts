@@ -41,6 +41,13 @@ export function genIndex(
     })
   }
 
+  src.addStatements((writer) => {
+    writer.writeLine('export * as AnchorErrors from "./anchor"')
+    if (hasCustomErrors) {
+      writer.writeLine('export * as CustomErrors from "./custom"')
+    }
+  })
+
   // fromCode function
   const fromCodeFn = src.addFunction({
     isExported: true,
