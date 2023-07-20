@@ -7,7 +7,7 @@ Latest:
 - Bump the version outputted by `--version` flag in `src/main.ts`.
 - Run `yarn build` and `yarn test`
 - Update CHANGELOG.md with the new version
-- Publish the latest version `yarn publish`
+- Publish the latest version `yarn npm publish`
 - Tag the beta with the new version `npm dist-tag add @dcaf/anchor-client-gen@vX.Y.Z beta`
 - Commit the changes to git
 - Tag the commit on master after merging with `git tag <version> && git push origin <version>`
@@ -16,6 +16,6 @@ Beta:
 
 - Update the version outputted by `--version` flag in `src/main.ts` to match the above
 - Run `yarn build` and `yarn test`
-- Publish the beta version `yarn publish --tag beta` (optionally do a dry run with `--dry-run`)
+- Publish the beta version `yarn npm publish --tag beta` (optionally do a dry run with `--dry-run`)
 - Commit the changes to git
 - Tag the commit on master after merging with `git tag <version> && git push origin <version>`
