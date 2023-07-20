@@ -223,7 +223,8 @@ export class State {
   }
 
   static toJSON(data: StateAccount): StateAccountJSON {
-    return {
+    // convert fields to classes if needed
+    const account = {
       boolField: data.boolField,
       u8Field: data.u8Field,
       i8Field: data.i8Field,
@@ -232,25 +233,59 @@ export class State {
       u32Field: data.u32Field,
       i32Field: data.i32Field,
       f32Field: data.f32Field,
-      u64Field: data.u64Field.toString(),
-      i64Field: data.i64Field.toString(),
+      u64Field: data.u64Field,
+      i64Field: data.i64Field,
       f64Field: data.f64Field,
-      u128Field: data.u128Field.toString(),
-      i128Field: data.i128Field.toString(),
-      bytesField: Array.from(data.bytesField.values()),
+      u128Field: data.u128Field,
+      i128Field: data.i128Field,
+      bytesField: data.bytesField,
       stringField: data.stringField,
-      pubkeyField: data.pubkeyField.toString(),
-      vecField: data.vecField.map((item) => item.toString()),
-      vecStructField: data.vecStructField.map((item) => item.toJSON()),
+      pubkeyField: data.pubkeyField,
+      vecField: data.vecField,
+      vecStructField: data.vecStructField.map(
+        (item) => new types.FooStruct({ ...item })
+      ),
       optionField: data.optionField,
       optionStructField:
-        (data.optionStructField && data.optionStructField.toJSON()) || null,
-      structField: data.structField.toJSON(),
+        (data.optionStructField &&
+          new types.FooStruct({ ...data.optionStructField })) ||
+        null,
+      structField: new types.FooStruct({ ...data.structField }),
       arrayField: data.arrayField,
-      enumField1: data.enumField1.toJSON(),
-      enumField2: data.enumField2.toJSON(),
-      enumField3: data.enumField3.toJSON(),
-      enumField4: data.enumField4.toJSON(),
+      enumField1: data.enumField1,
+      enumField2: data.enumField2,
+      enumField3: data.enumField3,
+      enumField4: data.enumField4,
+    }
+    return {
+      boolField: account.boolField,
+      u8Field: account.u8Field,
+      i8Field: account.i8Field,
+      u16Field: account.u16Field,
+      i16Field: account.i16Field,
+      u32Field: account.u32Field,
+      i32Field: account.i32Field,
+      f32Field: account.f32Field,
+      u64Field: account.u64Field.toString(),
+      i64Field: account.i64Field.toString(),
+      f64Field: account.f64Field,
+      u128Field: account.u128Field.toString(),
+      i128Field: account.i128Field.toString(),
+      bytesField: Array.from(account.bytesField.values()),
+      stringField: account.stringField,
+      pubkeyField: account.pubkeyField.toString(),
+      vecField: account.vecField.map((item) => item.toString()),
+      vecStructField: account.vecStructField.map((item) => item.toJSON()),
+      optionField: account.optionField,
+      optionStructField:
+        (account.optionStructField && account.optionStructField.toJSON()) ||
+        null,
+      structField: account.structField.toJSON(),
+      arrayField: account.arrayField,
+      enumField1: account.enumField1.toJSON(),
+      enumField2: account.enumField2.toJSON(),
+      enumField3: account.enumField3.toJSON(),
+      enumField4: account.enumField4.toJSON(),
     }
   }
 

@@ -332,14 +332,22 @@ function genAccountFiles(
       returnType: accountInterfaceJSON.getName(),
       statements: [
         (writer) => {
+          writer.writeLine("// convert fields to classes if needed")
+          writer.write(`const account = {`)
+          for (const field of fields) {
+            writer.writeLine(
+              `${field.name}: ${structFieldInitializer(idl, field, "data.")},`
+            )
+          }
+          writer.writeLine("}")
+
           writer.write(`return {`)
 
           fields.forEach((field) => {
             writer.writeLine(
-              `${field.name}: ${fieldToJSON(idl, field, "data.")},`
+              `${field.name}: ${fieldToJSON(idl, field, "account.")},`
             )
           })
-
           writer.write("}")
         },
       ],

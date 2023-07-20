@@ -98,13 +98,20 @@ export class Game {
   }
 
   static toJSON(data: GameAccount): GameAccountJSON {
-    return {
-      players: data.players.map((item) => item.toString()),
+    // convert fields to classes if needed
+    const account = {
+      players: data.players,
       turn: data.turn,
-      board: data.board.map((item) =>
+      board: data.board,
+      state: data.state,
+    }
+    return {
+      players: account.players.map((item) => item.toString()),
+      turn: account.turn,
+      board: account.board.map((item) =>
         item.map((item) => (item && item.toJSON()) || null)
       ),
-      state: data.state.toJSON(),
+      state: account.state.toJSON(),
     }
   }
 

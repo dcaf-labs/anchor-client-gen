@@ -81,8 +81,12 @@ export class State2 {
   }
 
   static toJSON(data: State2Account): State2AccountJSON {
+    // convert fields to classes if needed
+    const account = {
+      vecOfOption: data.vecOfOption,
+    }
     return {
-      vecOfOption: data.vecOfOption.map(
+      vecOfOption: account.vecOfOption.map(
         (item) => (item && item.toString()) || null
       ),
     }

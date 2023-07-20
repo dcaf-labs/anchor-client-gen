@@ -85,9 +85,14 @@ export class Counter {
   }
 
   static toJSON(data: CounterAccount): CounterAccountJSON {
+    // convert fields to classes if needed
+    const account = {
+      authority: data.authority,
+      count: data.count,
+    }
     return {
-      authority: data.authority.toString(),
-      count: data.count.toString(),
+      authority: account.authority.toString(),
+      count: account.count.toString(),
     }
   }
 
