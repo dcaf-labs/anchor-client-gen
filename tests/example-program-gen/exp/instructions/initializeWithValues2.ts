@@ -49,13 +49,17 @@ export class InitializeWithValues2 {
     248, 190, 21, 97, 239, 148, 39, 181,
   ])
 
-  constructor(readonly instructionData: InitializeWithValues2Instruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: InitializeWithValues2Instruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(InitializeWithValues2.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: InitializeWithValues2Args,
     flattenedAccounts: PublicKey[]
   ): InitializeWithValues2 {
@@ -64,14 +68,16 @@ export class InitializeWithValues2 {
       payer: flattenedAccounts[1],
       systemProgram: flattenedAccounts[2],
     }
-    return new InitializeWithValues2({ args, accounts })
+    return new InitializeWithValues2(programId, { args, accounts })
   }
 
   static decode(
+    programId: PublicKey,
     ixData: Uint8Array,
     flattenedAccounts: PublicKey[]
   ): InitializeWithValues2 {
     return InitializeWithValues2.fromDecoded(
+      programId,
       layout.decode(ixData, InitializeWithValues2.identifier.length),
       flattenedAccounts
     )
@@ -97,7 +103,7 @@ export class InitializeWithValues2 {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -113,7 +119,7 @@ export class InitializeWithValues2 {
     ]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

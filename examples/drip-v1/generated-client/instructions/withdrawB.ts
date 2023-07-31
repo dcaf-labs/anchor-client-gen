@@ -55,13 +55,19 @@ export class WithdrawB {
     28, 146, 254, 247, 183, 161, 195, 149,
   ])
 
-  constructor(readonly instructionData: WithdrawBInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: WithdrawBInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(WithdrawB.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): WithdrawB {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): WithdrawB {
     const accounts = {
       common: {
         withdrawer: flattenedAccounts[0],
@@ -78,11 +84,14 @@ export class WithdrawB {
         tokenProgram: flattenedAccounts[11],
       },
     }
-    return new WithdrawB({ args: null, accounts })
+    return new WithdrawB(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): WithdrawB {
-    return WithdrawB.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): WithdrawB {
+    return WithdrawB.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -150,11 +159,11 @@ export class WithdrawB {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = WithdrawB.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

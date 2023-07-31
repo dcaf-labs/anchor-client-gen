@@ -30,22 +30,31 @@ export class Increment {
     11, 18, 104, 9, 104, 174, 59, 33,
   ])
 
-  constructor(readonly instructionData: IncrementInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: IncrementInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(Increment.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): Increment {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): Increment {
     const accounts = {
       counter: flattenedAccounts[0],
       authority: flattenedAccounts[1],
     }
-    return new Increment({ args: null, accounts })
+    return new Increment(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): Increment {
-    return Increment.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): Increment {
+    return Increment.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -63,11 +72,11 @@ export class Increment {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = Increment.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

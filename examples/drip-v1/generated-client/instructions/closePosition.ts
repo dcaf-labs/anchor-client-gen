@@ -63,13 +63,19 @@ export class ClosePosition {
     123, 134, 81, 0, 49, 68, 98, 98,
   ])
 
-  constructor(readonly instructionData: ClosePositionInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: ClosePositionInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(ClosePosition.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): ClosePosition {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): ClosePosition {
     const accounts = {
       common: {
         withdrawer: flattenedAccounts[0],
@@ -90,11 +96,14 @@ export class ClosePosition {
       userTokenAAccount: flattenedAccounts[14],
       userPositionNftMint: flattenedAccounts[15],
     }
-    return new ClosePosition({ args: null, accounts })
+    return new ClosePosition(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): ClosePosition {
-    return ClosePosition.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): ClosePosition {
+    return ClosePosition.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -182,11 +191,11 @@ export class ClosePosition {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = ClosePosition.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

@@ -65,13 +65,19 @@ export class DripOrcaWhirlpool {
     31, 217, 180, 147, 224, 40, 53, 88,
   ])
 
-  constructor(readonly instructionData: DripOrcaWhirlpoolInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: DripOrcaWhirlpoolInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(DripOrcaWhirlpool.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): DripOrcaWhirlpool {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): DripOrcaWhirlpool {
     const accounts = {
       common: {
         dripTriggerSource: flattenedAccounts[0],
@@ -93,11 +99,14 @@ export class DripOrcaWhirlpool {
       oracle: flattenedAccounts[15],
       whirlpoolProgram: flattenedAccounts[16],
     }
-    return new DripOrcaWhirlpool({ args: null, accounts })
+    return new DripOrcaWhirlpool(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): DripOrcaWhirlpool {
-    return DripOrcaWhirlpool.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): DripOrcaWhirlpool {
+    return DripOrcaWhirlpool.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -190,11 +199,11 @@ export class DripOrcaWhirlpool {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = DripOrcaWhirlpool.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

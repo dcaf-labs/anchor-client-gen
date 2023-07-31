@@ -45,13 +45,17 @@ export class InitVaultProtoConfig {
     195, 96, 99, 29, 46, 21, 146, 219,
   ])
 
-  constructor(readonly instructionData: InitVaultProtoConfigInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: InitVaultProtoConfigInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(InitVaultProtoConfig.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: InitVaultProtoConfigArgs,
     flattenedAccounts: PublicKey[]
   ): InitVaultProtoConfig {
@@ -60,14 +64,16 @@ export class InitVaultProtoConfig {
       vaultProtoConfig: flattenedAccounts[1],
       systemProgram: flattenedAccounts[2],
     }
-    return new InitVaultProtoConfig({ args, accounts })
+    return new InitVaultProtoConfig(programId, { args, accounts })
   }
 
   static decode(
+    programId: PublicKey,
     ixData: Uint8Array,
     flattenedAccounts: PublicKey[]
   ): InitVaultProtoConfig {
     return InitVaultProtoConfig.fromDecoded(
+      programId,
       layout.decode(ixData, InitVaultProtoConfig.identifier.length),
       flattenedAccounts
     )
@@ -93,7 +99,7 @@ export class InitVaultProtoConfig {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -109,7 +115,7 @@ export class InitVaultProtoConfig {
     )
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

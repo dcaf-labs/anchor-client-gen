@@ -45,13 +45,17 @@ export class SetVaultSwapWhitelist {
     215, 229, 51, 175, 90, 52, 232, 25,
   ])
 
-  constructor(readonly instructionData: SetVaultSwapWhitelistInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: SetVaultSwapWhitelistInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(SetVaultSwapWhitelist.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: SetVaultSwapWhitelistArgs,
     flattenedAccounts: PublicKey[]
   ): SetVaultSwapWhitelist {
@@ -60,14 +64,16 @@ export class SetVaultSwapWhitelist {
       vault: flattenedAccounts[1],
       vaultProtoConfig: flattenedAccounts[2],
     }
-    return new SetVaultSwapWhitelist({ args, accounts })
+    return new SetVaultSwapWhitelist(programId, { args, accounts })
   }
 
   static decode(
+    programId: PublicKey,
     ixData: Uint8Array,
     flattenedAccounts: PublicKey[]
   ): SetVaultSwapWhitelist {
     return SetVaultSwapWhitelist.fromDecoded(
+      programId,
       layout.decode(ixData, SetVaultSwapWhitelist.identifier.length),
       flattenedAccounts
     )
@@ -93,7 +99,7 @@ export class SetVaultSwapWhitelist {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -109,7 +115,7 @@ export class SetVaultSwapWhitelist {
     ]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

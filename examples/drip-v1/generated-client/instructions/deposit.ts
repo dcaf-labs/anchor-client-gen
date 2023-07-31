@@ -67,13 +67,17 @@ export class Deposit {
     242, 35, 198, 137, 82, 225, 242, 182,
   ])
 
-  constructor(readonly instructionData: DepositInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: DepositInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(Deposit.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: DepositArgs,
     flattenedAccounts: PublicKey[]
   ): Deposit {
@@ -94,11 +98,16 @@ export class Deposit {
         systemProgram: flattenedAccounts[12],
       },
     }
-    return new Deposit({ args, accounts })
+    return new Deposit(programId, { args, accounts })
   }
 
-  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): Deposit {
+  static decode(
+    programId: PublicKey,
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): Deposit {
     return Deposit.fromDecoded(
+      programId,
       layout.decode(ixData, Deposit.identifier.length),
       flattenedAccounts
     )
@@ -174,7 +183,7 @@ export class Deposit {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -187,7 +196,7 @@ export class Deposit {
     const data = Buffer.concat([Deposit.identifier, buffer]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

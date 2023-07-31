@@ -21,29 +21,32 @@ export class CauseError {
     67, 104, 37, 17, 2, 155, 68, 17,
   ])
 
-  constructor(readonly instructionData: CauseErrorInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: CauseErrorInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(CauseError.identifier)
   }
 
-  static fromDecoded(): CauseError {
-    return new CauseError({ args: null, accounts: null })
+  static fromDecoded(programId: PublicKey): CauseError {
+    return new CauseError(programId, { args: null, accounts: null })
   }
 
-  static decode(): CauseError {
-    return CauseError.fromDecoded()
+  static decode(programId: PublicKey): CauseError {
+    return CauseError.fromDecoded(programId)
   }
 
   toAccountMetas(): AccountMeta[] {
     return []
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = CauseError.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

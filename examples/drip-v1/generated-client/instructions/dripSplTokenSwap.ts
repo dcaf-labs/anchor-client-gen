@@ -63,13 +63,19 @@ export class DripSplTokenSwap {
     129, 32, 61, 181, 42, 74, 219, 106,
   ])
 
-  constructor(readonly instructionData: DripSplTokenSwapInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: DripSplTokenSwapInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(DripSplTokenSwap.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): DripSplTokenSwap {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): DripSplTokenSwap {
     const accounts = {
       common: {
         dripTriggerSource: flattenedAccounts[0],
@@ -90,11 +96,14 @@ export class DripSplTokenSwap {
       swapAuthority: flattenedAccounts[14],
       tokenSwapProgram: flattenedAccounts[15],
     }
-    return new DripSplTokenSwap({ args: null, accounts })
+    return new DripSplTokenSwap(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): DripSplTokenSwap {
-    return DripSplTokenSwap.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): DripSplTokenSwap {
+    return DripSplTokenSwap.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -182,11 +191,11 @@ export class DripSplTokenSwap {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = DripSplTokenSwap.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

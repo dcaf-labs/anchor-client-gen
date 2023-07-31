@@ -41,22 +41,34 @@ export class Play {
     213, 157, 193, 142, 228, 56, 248, 150,
   ])
 
-  constructor(readonly instructionData: PlayInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: PlayInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(Play.identifier)
   }
 
-  static fromDecoded(args: PlayArgs, flattenedAccounts: PublicKey[]): Play {
+  static fromDecoded(
+    programId: PublicKey,
+    args: PlayArgs,
+    flattenedAccounts: PublicKey[]
+  ): Play {
     const accounts = {
       game: flattenedAccounts[0],
       player: flattenedAccounts[1],
     }
-    return new Play({ args, accounts })
+    return new Play(programId, { args, accounts })
   }
 
-  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): Play {
+  static decode(
+    programId: PublicKey,
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): Play {
     return Play.fromDecoded(
+      programId,
       layout.decode(ixData, Play.identifier.length),
       flattenedAccounts
     )
@@ -77,7 +89,7 @@ export class Play {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -88,7 +100,7 @@ export class Play {
     const data = Buffer.concat([Play.identifier, buffer]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

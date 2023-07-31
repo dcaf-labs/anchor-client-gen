@@ -43,13 +43,17 @@ export class SetupGame {
     180, 218, 128, 75, 58, 222, 35, 82,
   ])
 
-  constructor(readonly instructionData: SetupGameInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: SetupGameInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(SetupGame.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: SetupGameArgs,
     flattenedAccounts: PublicKey[]
   ): SetupGame {
@@ -58,11 +62,16 @@ export class SetupGame {
       playerOne: flattenedAccounts[1],
       systemProgram: flattenedAccounts[2],
     }
-    return new SetupGame({ args, accounts })
+    return new SetupGame(programId, { args, accounts })
   }
 
-  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): SetupGame {
+  static decode(
+    programId: PublicKey,
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): SetupGame {
     return SetupGame.fromDecoded(
+      programId,
       layout.decode(ixData, SetupGame.identifier.length),
       flattenedAccounts
     )
@@ -88,7 +97,7 @@ export class SetupGame {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -99,7 +108,7 @@ export class SetupGame {
     const data = Buffer.concat([SetupGame.identifier, buffer]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

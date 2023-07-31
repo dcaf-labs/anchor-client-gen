@@ -61,13 +61,17 @@ export class InitVault {
     77, 79, 85, 150, 33, 217, 52, 106,
   ])
 
-  constructor(readonly instructionData: InitVaultInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: InitVaultInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(InitVault.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: InitVaultArgs,
     flattenedAccounts: PublicKey[]
   ): InitVault {
@@ -85,11 +89,16 @@ export class InitVault {
       systemProgram: flattenedAccounts[10],
       rent: flattenedAccounts[11],
     }
-    return new InitVault({ args, accounts })
+    return new InitVault(programId, { args, accounts })
   }
 
-  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): InitVault {
+  static decode(
+    programId: PublicKey,
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): InitVault {
     return InitVault.fromDecoded(
+      programId,
       layout.decode(ixData, InitVault.identifier.length),
       flattenedAccounts
     )
@@ -160,7 +169,7 @@ export class InitVault {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -173,7 +182,7 @@ export class InitVault {
     const data = Buffer.concat([InitVault.identifier, buffer]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

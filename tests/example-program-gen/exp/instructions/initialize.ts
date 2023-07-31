@@ -45,13 +45,19 @@ export class Initialize {
     175, 175, 109, 31, 13, 152, 155, 237,
   ])
 
-  constructor(readonly instructionData: InitializeInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: InitializeInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(Initialize.identifier)
   }
 
-  static fromDecoded(flattenedAccounts: PublicKey[]): Initialize {
+  static fromDecoded(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): Initialize {
     const accounts = {
       state: flattenedAccounts[0],
       nested: {
@@ -61,11 +67,14 @@ export class Initialize {
       payer: flattenedAccounts[3],
       systemProgram: flattenedAccounts[4],
     }
-    return new Initialize({ args: null, accounts })
+    return new Initialize(programId, { args: null, accounts })
   }
 
-  static decode(flattenedAccounts: PublicKey[]): Initialize {
-    return Initialize.fromDecoded(flattenedAccounts)
+  static decode(
+    programId: PublicKey,
+    flattenedAccounts: PublicKey[]
+  ): Initialize {
+    return Initialize.fromDecoded(programId, flattenedAccounts)
   }
 
   toAccountMetas(): AccountMeta[] {
@@ -98,11 +107,11 @@ export class Initialize {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const data = Initialize.identifier
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

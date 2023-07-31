@@ -71,13 +71,17 @@ export class DepositWithMetadata {
     66, 112, 168, 108, 67, 61, 27, 151,
   ])
 
-  constructor(readonly instructionData: DepositWithMetadataInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: DepositWithMetadataInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(DepositWithMetadata.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: DepositWithMetadataArgs,
     flattenedAccounts: PublicKey[]
   ): DepositWithMetadata {
@@ -100,14 +104,16 @@ export class DepositWithMetadata {
       positionMetadataAccount: flattenedAccounts[13],
       metadataProgram: flattenedAccounts[14],
     }
-    return new DepositWithMetadata({ args, accounts })
+    return new DepositWithMetadata(programId, { args, accounts })
   }
 
   static decode(
+    programId: PublicKey,
     ixData: Uint8Array,
     flattenedAccounts: PublicKey[]
   ): DepositWithMetadata {
     return DepositWithMetadata.fromDecoded(
+      programId,
       layout.decode(ixData, DepositWithMetadata.identifier.length),
       flattenedAccounts
     )
@@ -193,7 +199,7 @@ export class DepositWithMetadata {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -209,7 +215,7 @@ export class DepositWithMetadata {
     )
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

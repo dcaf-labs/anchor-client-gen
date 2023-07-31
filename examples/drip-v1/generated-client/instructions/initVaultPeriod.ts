@@ -47,13 +47,17 @@ export class InitVaultPeriod {
     46, 103, 251, 142, 95, 43, 55, 27,
   ])
 
-  constructor(readonly instructionData: InitVaultPeriodInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: InitVaultPeriodInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(InitVaultPeriod.identifier)
   }
 
   static fromDecoded(
+    programId: PublicKey,
     args: InitVaultPeriodArgs,
     flattenedAccounts: PublicKey[]
   ): InitVaultPeriod {
@@ -63,14 +67,16 @@ export class InitVaultPeriod {
       creator: flattenedAccounts[2],
       systemProgram: flattenedAccounts[3],
     }
-    return new InitVaultPeriod({ args, accounts })
+    return new InitVaultPeriod(programId, { args, accounts })
   }
 
   static decode(
+    programId: PublicKey,
     ixData: Uint8Array,
     flattenedAccounts: PublicKey[]
   ): InitVaultPeriod {
     return InitVaultPeriod.fromDecoded(
+      programId,
       layout.decode(ixData, InitVaultPeriod.identifier.length),
       flattenedAccounts
     )
@@ -101,7 +107,7 @@ export class InitVaultPeriod {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -117,7 +123,7 @@ export class InitVaultPeriod {
     )
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

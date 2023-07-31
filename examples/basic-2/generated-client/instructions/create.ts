@@ -42,23 +42,35 @@ export class Create {
     24, 30, 200, 40, 5, 28, 7, 119,
   ])
 
-  constructor(readonly instructionData: CreateInstruction) {}
+  constructor(
+    readonly programId: PublicKey,
+    readonly instructionData: CreateInstruction
+  ) {}
 
   static isIdentifierEqual(ixData: Buffer): boolean {
     return ixData.subarray(0, 8).equals(Create.identifier)
   }
 
-  static fromDecoded(args: CreateArgs, flattenedAccounts: PublicKey[]): Create {
+  static fromDecoded(
+    programId: PublicKey,
+    args: CreateArgs,
+    flattenedAccounts: PublicKey[]
+  ): Create {
     const accounts = {
       counter: flattenedAccounts[0],
       user: flattenedAccounts[1],
       systemProgram: flattenedAccounts[2],
     }
-    return new Create({ args, accounts })
+    return new Create(programId, { args, accounts })
   }
 
-  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): Create {
+  static decode(
+    programId: PublicKey,
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): Create {
     return Create.fromDecoded(
+      programId,
       layout.decode(ixData, Create.identifier.length),
       flattenedAccounts
     )
@@ -84,7 +96,7 @@ export class Create {
     ]
   }
 
-  build(programId: PublicKey) {
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
       {
@@ -95,7 +107,7 @@ export class Create {
     const data = Buffer.concat([Create.identifier, buffer]).slice(0, 8 + len)
     const ix = new TransactionInstruction({
       keys: this.toAccountMetas(),
-      programId: programId,
+      programId: this.programId,
       data,
     })
     return ix

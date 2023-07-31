@@ -233,6 +233,9 @@ function genInstructionFiles(
         } else {
           writer.write("PublicKey")
         }
+        if (accItem.isOptional) {
+          writer.write(" | undefined")
+        }
         return
       }
       writer.block(() => {
@@ -383,6 +386,11 @@ function genInstructionFiles(
       parameters: [
         {
           isReadonly: true,
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
+          isReadonly: true,
           name: "instructionData",
           type: instructionInterface.getName(),
         },
@@ -411,6 +419,12 @@ function genInstructionFiles(
     const fromDecodedMethod = cls.addMethod({
       isStatic: true,
       name: "fromDecoded",
+      parameters: [
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+      ],
       returnType: cls.getName(),
     })
     if (argsInterface) {
@@ -441,9 +455,11 @@ function genInstructionFiles(
                     recurseAccounts(item.accounts, [...nestedNames, item.name])
                     writer.writeLine(`},`)
                   } else {
-                    writer.writeLine(
-                      `${item.name}: flattenedAccounts[${accountIndex}],`
-                    )
+                    let accountRef = `flattenedAccounts[${accountIndex}]`
+                    if (item.isOptional) {
+                      accountRef = `programId.toString() === ${accountRef}.toString() ? undefined : ${accountRef}`
+                    }
+                    writer.writeLine(`${item.name}: ${accountRef},`)
                     accountIndex = accountIndex + 1
                   }
                 })
@@ -457,15 +473,21 @@ function genInstructionFiles(
       })
     }
     fromDecodedMethod.addStatements([
-      `return new ${cls.getName()}({${argsInterface ? "args," : "args: null,"}${
-        accountsInterface ? "accounts," : "accounts: null,"
-      }})`,
+      `return new ${cls.getName()}(programId,{${
+        argsInterface ? "args," : "args: null,"
+      }${accountsInterface ? "accounts," : "accounts: null,"}})`,
     ])
 
     // decode
     const decodedMethod = cls.addMethod({
       isStatic: true,
       name: "decode",
+      parameters: [
+        {
+          name: "programId",
+          type: "PublicKey",
+        },
+      ],
       returnType: cls.getName(),
     })
     if (argsInterface) {
@@ -481,7 +503,7 @@ function genInstructionFiles(
       })
     }
     decodedMethod.addStatements([
-      `return ${cls.getName()}.${fromDecodedMethod.getName()}(${
+      `return ${cls.getName()}.${fromDecodedMethod.getName()}(programId,${
         argsInterface
           ? `layout.decode(ixData, ${cls.getName()}.${identifier.getName()}.length),`
           : ""
@@ -509,12 +531,14 @@ function genInstructionFiles(
                 // /** True if the `pubkey` can be loaded as a read-write account. */
                 // isWritable: boolean;
                 writer.writeLine("{")
-                writer.writeLine(
-                  `pubkey: this.instructionData.accounts.${[
-                    ...nestedNames,
-                    item.name,
-                  ].join(".")},`
-                )
+                let accountRef = `this.instructionData.accounts.${[
+                  ...nestedNames,
+                  item.name,
+                ].join(".")}`
+                if (item.isOptional) {
+                  accountRef = `${accountRef} || this.programId`
+                }
+                writer.writeLine(`pubkey: ${accountRef},`)
                 writer.writeLine(`isSigner: ${item.isSigner},`)
                 writer.writeLine(`isWritable: ${item.isMut},`)
                 writer.writeLine("},")
@@ -532,12 +556,6 @@ function genInstructionFiles(
     // build
     const buildMethod = cls.addMethod({
       name: "build",
-      parameters: [
-        {
-          name: "programId",
-          type: "PublicKey",
-        },
-      ],
     })
     if (argsInterface) {
       buildMethod.addVariableStatement({
@@ -599,7 +617,7 @@ function genInstructionFiles(
       declarations: [
         {
           name: "ix",
-          initializer: `new TransactionInstruction({ keys: this.${toAccountMetas.getName()}(), programId: programId, data })`,
+          initializer: `new TransactionInstruction({ keys: this.${toAccountMetas.getName()}(), programId: this.programId, data })`,
         },
       ],
     })
@@ -658,12 +676,16 @@ function genInstructionFiles(
                 recurseAccounts(item.accounts, [...nestedNames, item.name])
                 writer.writeLine(`},`)
               } else {
-                writer.writeLine(
-                  `${item.name}: this.instructionData.accounts.${[
-                    ...nestedNames,
-                    item.name,
-                  ].join(".")}.toString(),`
-                )
+                let accountRefToString = `this.instructionData.accounts.${[
+                  ...nestedNames,
+                  item.name,
+                ].join(".")}`
+                if (item.isOptional) {
+                  accountRefToString = `${accountRefToString}?.toString()`
+                } else {
+                  accountRefToString = `${accountRefToString}.toString()`
+                }
+                writer.writeLine(`${item.name}: ${accountRefToString},`)
               }
             })
           }
