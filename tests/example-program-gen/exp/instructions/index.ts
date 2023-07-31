@@ -37,22 +37,27 @@ export async function processInstruction(
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
-): Promise<void> {
-  const identifier = Buffer.from(ixData.slice(0, 8))
-  if (Initialize.isIdentifierEqual(identifier)) {
+): Promise<boolean> {
+  const ixDataBuff = Buffer.from(ixData)
+  if (Initialize.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Initialize.decode(accounts)
     await instructionHandler.initializeIxHandler(decodedIx)
+    return true
   }
-  if (InitializeWithValues.isIdentifierEqual(identifier)) {
-    const decodedIx = InitializeWithValues.decode(ixData, accounts)
+  if (InitializeWithValues.isIdentifierEqual(ixDataBuff)) {
+    const decodedIx = InitializeWithValues.decode(ixDataBuff, accounts)
     await instructionHandler.initializeWithValuesIxHandler(decodedIx)
+    return true
   }
-  if (InitializeWithValues2.isIdentifierEqual(identifier)) {
-    const decodedIx = InitializeWithValues2.decode(ixData, accounts)
+  if (InitializeWithValues2.isIdentifierEqual(ixDataBuff)) {
+    const decodedIx = InitializeWithValues2.decode(ixDataBuff, accounts)
     await instructionHandler.initializeWithValues2IxHandler(decodedIx)
+    return true
   }
-  if (CauseError.isIdentifierEqual(identifier)) {
+  if (CauseError.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = CauseError.decode()
     await instructionHandler.causeErrorIxHandler(decodedIx)
+    return true
   }
+  return false
 }

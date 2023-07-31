@@ -22,14 +22,17 @@ export async function processInstruction(
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
-): Promise<void> {
-  const identifier = Buffer.from(ixData.slice(0, 8))
-  if (SetupGame.isIdentifierEqual(identifier)) {
-    const decodedIx = SetupGame.decode(ixData, accounts)
+): Promise<boolean> {
+  const ixDataBuff = Buffer.from(ixData)
+  if (SetupGame.isIdentifierEqual(ixDataBuff)) {
+    const decodedIx = SetupGame.decode(ixDataBuff, accounts)
     await instructionHandler.setupGameIxHandler(decodedIx)
+    return true
   }
-  if (Play.isIdentifierEqual(identifier)) {
-    const decodedIx = Play.decode(ixData, accounts)
+  if (Play.isIdentifierEqual(ixDataBuff)) {
+    const decodedIx = Play.decode(ixDataBuff, accounts)
     await instructionHandler.playIxHandler(decodedIx)
+    return true
   }
+  return false
 }

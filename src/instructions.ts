@@ -102,6 +102,7 @@ function genIndexFile(
     }
   }
 
+  // Create Instruction Handler
   if (idl.instructions.length > 0) {
     const instructionHandlerType = src.addInterface({
       isExported: true,
@@ -137,27 +138,29 @@ function genIndexFile(
           type: instructionHandlerType.getName(),
         },
       ],
-      returnType: "Promise<void>",
+      returnType: "Promise<boolean>",
     })
     processInstruction.addStatements((writer) => {
-      writer.writeLine("const identifier = Buffer.from(ixData.slice(0,8))")
+      writer.writeLine("const ixDataBuff = Buffer.from(ixData)")
     })
     idl.instructions.forEach((ix) => {
       processInstruction.addStatements((writer) => {
         writer.write(
-          `if (${capitalize(ix.name)}.isIdentifierEqual(identifier))`
+          `if (${capitalize(ix.name)}.isIdentifierEqual(ixDataBuff))`
         )
         writer.block(() => {
           writer.write(`const decodedIx = ${capitalize(ix.name)}.decode(`)
-          writer.conditionalWrite(ix.args.length > 0, "ixData,")
+          writer.conditionalWrite(ix.args.length > 0, "ixDataBuff,")
           writer.conditionalWrite(ix.accounts.length > 0, "accounts")
           writer.write(")")
           writer.writeLine(
             `await instructionHandler.${camelcase(ix.name)}IxHandler(decodedIx)`
           )
+          writer.writeLine("return true")
         })
       })
     })
+    processInstruction.addStatements(["return false"])
   }
 }
 

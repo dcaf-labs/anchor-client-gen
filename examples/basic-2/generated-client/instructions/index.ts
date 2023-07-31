@@ -22,14 +22,17 @@ export async function processInstruction(
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
-): Promise<void> {
-  const identifier = Buffer.from(ixData.slice(0, 8))
-  if (Create.isIdentifierEqual(identifier)) {
-    const decodedIx = Create.decode(ixData, accounts)
+): Promise<boolean> {
+  const ixDataBuff = Buffer.from(ixData)
+  if (Create.isIdentifierEqual(ixDataBuff)) {
+    const decodedIx = Create.decode(ixDataBuff, accounts)
     await instructionHandler.createIxHandler(decodedIx)
+    return true
   }
-  if (Increment.isIdentifierEqual(identifier)) {
+  if (Increment.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Increment.decode(accounts)
     await instructionHandler.incrementIxHandler(decodedIx)
+    return true
   }
+  return false
 }

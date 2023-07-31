@@ -13,6 +13,7 @@ import {
   tsTypeFromIdl,
 } from "./common"
 import { IdlAccountDef } from "@coral-xyz/anchor/dist/cjs/idl"
+import camelcase from "camelcase"
 
 export function genAccounts(
   project: Project,
@@ -38,20 +39,82 @@ function genIndexFile(
   src.addStatements([
     `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
   ])
-  idl.accounts?.forEach((ix) => {
+  idl.accounts?.forEach((account) => {
+    src.addImportDeclaration({
+      namedImports: [{ name: account.name }],
+      moduleSpecifier: `./${account.name}`,
+    })
     src.addExportDeclaration({
-      namedExports: [ix.name],
-      moduleSpecifier: `./${ix.name}`,
+      namedExports: [account.name],
+      moduleSpecifier: `./${account.name}`,
     })
     src.addExportDeclaration({
       namedExports: [
-        accountInterfaceName(ix.name),
-        jsonInterfaceName(accountInterfaceName(ix.name)),
+        accountInterfaceName(account.name),
+        jsonInterfaceName(accountInterfaceName(account.name)),
       ],
       isTypeOnly: true,
-      moduleSpecifier: `./${ix.name}`,
+      moduleSpecifier: `./${account.name}`,
     })
   })
+  if (idl.accounts?.length ?? 0 > 0) {
+    const accountHandlerType = src.addInterface({
+      isExported: true,
+      name: "AccountHandler",
+    })
+    idl.accounts?.forEach((account) => {
+      const accountHandler = accountHandlerType.addMethod({
+        name: `${camelcase(account.name)}AccountHandler`,
+        parameters: [
+          {
+            name: "account",
+            type: account.name,
+          },
+        ],
+        returnType: "Promise<void>",
+      })
+    })
+    const processAccount = src.addFunction({
+      isAsync: true,
+      isExported: true,
+      name: "processAccount",
+      parameters: [
+        {
+          name: "accountData",
+          type: "Uint8Array",
+        },
+        {
+          name: "accountHandler",
+          type: accountHandlerType.getName(),
+        },
+      ],
+      returnType: "Promise<boolean>",
+    })
+    processAccount.addStatements((writer) => {
+      writer.writeLine("const accountDataBuff = Buffer.from(accountData)")
+    })
+    idl.accounts?.forEach((account) => {
+      processAccount.addStatements((writer) => {
+        writer.write(
+          `if (${account.name}.isDiscriminatorEqual(accountDataBuff))`
+        )
+        writer.block(() => {
+          writer.write(
+            `const decodedAccount = ${account.name}.decode(accountDataBuff)`
+          )
+          writer.writeLine(
+            `await accountHandler.${camelcase(
+              account.name
+            )}AccountHandler(decodedAccount)`
+          )
+          writer.write("return true")
+        })
+      })
+    })
+    processAccount.addStatements((writer) => {
+      writer.writeLine("return false")
+    })
+  }
 }
 
 function genAccountFiles(
