@@ -45,6 +45,7 @@ const layout = borsh.struct([
  */
 export class InitializeWithValues2 {
   static readonly ixName = "initializeWithValues2"
+  readonly ixName = InitializeWithValues2.ixName
   static readonly identifier: Buffer = Buffer.from([
     248, 190, 21, 97, 239, 148, 39, 181,
   ])

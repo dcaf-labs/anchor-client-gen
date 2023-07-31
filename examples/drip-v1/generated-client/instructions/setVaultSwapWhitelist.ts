@@ -41,6 +41,7 @@ const layout = borsh.struct([
 
 export class SetVaultSwapWhitelist {
   static readonly ixName = "setVaultSwapWhitelist"
+  readonly ixName = SetVaultSwapWhitelist.ixName
   static readonly identifier: Buffer = Buffer.from([
     215, 229, 51, 175, 90, 52, 232, 25,
   ])

@@ -39,6 +39,7 @@ const layout = borsh.struct([borsh.publicKey("playerTwo")])
 
 export class SetupGame {
   static readonly ixName = "setupGame"
+  readonly ixName = SetupGame.ixName
   static readonly identifier: Buffer = Buffer.from([
     180, 218, 128, 75, 58, 222, 35, 82,
   ])

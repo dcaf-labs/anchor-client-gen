@@ -41,6 +41,7 @@ const layout = borsh.struct([
 
 export class InitVaultProtoConfig {
   static readonly ixName = "initVaultProtoConfig"
+  readonly ixName = InitVaultProtoConfig.ixName
   static readonly identifier: Buffer = Buffer.from([
     195, 96, 99, 29, 46, 21, 146, 219,
   ])

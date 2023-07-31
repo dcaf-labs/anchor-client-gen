@@ -63,6 +63,7 @@ const layout = borsh.struct([types.DepositParams.layout("params")])
 
 export class Deposit {
   static readonly ixName = "deposit"
+  readonly ixName = Deposit.ixName
   static readonly identifier: Buffer = Buffer.from([
     242, 35, 198, 137, 82, 225, 242, 182,
   ])

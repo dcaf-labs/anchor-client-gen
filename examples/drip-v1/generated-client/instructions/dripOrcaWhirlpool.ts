@@ -61,6 +61,7 @@ export interface DripOrcaWhirlpoolInstructionJSON {
 
 export class DripOrcaWhirlpool {
   static readonly ixName = "dripOrcaWhirlpool"
+  readonly ixName = DripOrcaWhirlpool.ixName
   static readonly identifier: Buffer = Buffer.from([
     31, 217, 180, 147, 224, 40, 53, 88,
   ])

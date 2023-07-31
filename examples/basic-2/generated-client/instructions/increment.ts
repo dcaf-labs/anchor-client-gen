@@ -26,6 +26,7 @@ export interface IncrementInstructionJSON {
 
 export class Increment {
   static readonly ixName = "increment"
+  readonly ixName = Increment.ixName
   static readonly identifier: Buffer = Buffer.from([
     11, 18, 104, 9, 104, 174, 59, 33,
   ])

@@ -59,6 +59,7 @@ export interface ClosePositionInstructionJSON {
 
 export class ClosePosition {
   static readonly ixName = "closePosition"
+  readonly ixName = ClosePosition.ixName
   static readonly identifier: Buffer = Buffer.from([
     123, 134, 81, 0, 49, 68, 98, 98,
   ])

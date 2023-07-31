@@ -41,6 +41,7 @@ export interface InitializeInstructionJSON {
 
 export class Initialize {
   static readonly ixName = "initialize"
+  readonly ixName = Initialize.ixName
   static readonly identifier: Buffer = Buffer.from([
     175, 175, 109, 31, 13, 152, 155, 237,
   ])

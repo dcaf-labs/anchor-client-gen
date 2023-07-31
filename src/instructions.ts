@@ -379,6 +379,11 @@ function genInstructionFiles(
       name: "ixName",
       initializer: `'${ix.name}'`,
     })
+    cls.addProperty({
+      isReadonly: true,
+      name: "ixName",
+      initializer: `${cls.getName()}.ixName`,
+    })
 
     const identifier = cls.addProperty({
       isStatic: true,

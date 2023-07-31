@@ -129,6 +129,7 @@ const layout = borsh.struct([
 /** Initializes an account with specified values */
 export class InitializeWithValues {
   static readonly ixName = "initializeWithValues"
+  readonly ixName = InitializeWithValues.ixName
   static readonly identifier: Buffer = Buffer.from([
     220, 73, 8, 213, 178, 69, 181, 141,
   ])

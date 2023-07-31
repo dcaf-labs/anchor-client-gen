@@ -67,6 +67,7 @@ const layout = borsh.struct([types.DepositParams.layout("params")])
 
 export class DepositWithMetadata {
   static readonly ixName = "depositWithMetadata"
+  readonly ixName = DepositWithMetadata.ixName
   static readonly identifier: Buffer = Buffer.from([
     66, 112, 168, 108, 67, 61, 27, 151,
   ])

@@ -38,6 +38,7 @@ const layout = borsh.struct([borsh.publicKey("authority")])
 
 export class Create {
   static readonly ixName = "create"
+  readonly ixName = Create.ixName
   static readonly identifier: Buffer = Buffer.from([
     24, 30, 200, 40, 5, 28, 7, 119,
   ])

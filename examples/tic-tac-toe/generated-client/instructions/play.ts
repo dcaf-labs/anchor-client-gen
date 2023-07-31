@@ -37,6 +37,7 @@ const layout = borsh.struct([types.Tile.layout("tile")])
 
 export class Play {
   static readonly ixName = "play"
+  readonly ixName = Play.ixName
   static readonly identifier: Buffer = Buffer.from([
     213, 157, 193, 142, 228, 56, 248, 150,
   ])

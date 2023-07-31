@@ -59,6 +59,7 @@ export interface DripSplTokenSwapInstructionJSON {
 
 export class DripSplTokenSwap {
   static readonly ixName = "dripSplTokenSwap"
+  readonly ixName = DripSplTokenSwap.ixName
   static readonly identifier: Buffer = Buffer.from([
     129, 32, 61, 181, 42, 74, 219, 106,
   ])

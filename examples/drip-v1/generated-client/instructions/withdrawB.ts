@@ -51,6 +51,7 @@ export interface WithdrawBInstructionJSON {
 
 export class WithdrawB {
   static readonly ixName = "withdrawB"
+  readonly ixName = WithdrawB.ixName
   static readonly identifier: Buffer = Buffer.from([
     28, 146, 254, 247, 183, 161, 195, 149,
   ])

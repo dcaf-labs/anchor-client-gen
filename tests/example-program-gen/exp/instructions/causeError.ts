@@ -17,6 +17,7 @@ export interface CauseErrorInstructionJSON {
 
 export class CauseError {
   static readonly ixName = "causeError"
+  readonly ixName = CauseError.ixName
   static readonly identifier: Buffer = Buffer.from([
     67, 104, 37, 17, 2, 155, 68, 17,
   ])
