@@ -67,6 +67,16 @@ export class InitializeWithValues2 {
     return new InitializeWithValues2({ args, accounts })
   }
 
+  static decode(
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): InitializeWithValues2 {
+    return InitializeWithValues2.fromDecoded(
+      layout.decode(ixData, InitializeWithValues2.identifier.length),
+      flattenedAccounts
+    )
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

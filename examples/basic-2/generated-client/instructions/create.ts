@@ -57,6 +57,13 @@ export class Create {
     return new Create({ args, accounts })
   }
 
+  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): Create {
+    return Create.fromDecoded(
+      layout.decode(ixData, Create.identifier.length),
+      flattenedAccounts
+    )
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

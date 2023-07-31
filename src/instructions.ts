@@ -302,7 +302,7 @@ function genInstructionFiles(
       initializer: `'${ix.name}'`,
     })
 
-    cls.addProperty({
+    const identifier = cls.addProperty({
       isStatic: true,
       isReadonly: true,
       name: "identifier",
@@ -387,6 +387,37 @@ function genInstructionFiles(
         ],
       })
     }
+    fromDecodedMethod.addStatements([
+      `return new ${cls.getName()}({${argsInterface ? "args," : "args: null,"}${
+        accountsInterface ? "accounts," : "accounts: null,"
+      }})`,
+    ])
+
+    // decode
+    const decodedMethod = cls.addMethod({
+      isStatic: true,
+      name: "decode",
+      returnType: cls.getName(),
+    })
+    if (argsInterface) {
+      decodedMethod.addParameter({
+        name: "ixData",
+        type: "Uint8Array",
+      })
+    }
+    if (ix.accounts.length > 0) {
+      decodedMethod.addParameter({
+        name: "flattenedAccounts",
+        type: "PublicKey[]",
+      })
+    }
+    decodedMethod.addStatements([
+      `return ${cls.getName()}.${fromDecodedMethod.getName()}(${
+        argsInterface
+          ? `layout.decode(ixData, ${cls.getName()}.${identifier.getName()}.length),`
+          : ""
+      }${accountsInterface ? "flattenedAccounts" : ""})`,
+    ])
 
     // toAccountMetas
     const toAccountMetas = cls.addMethod({
@@ -428,12 +459,6 @@ function genInstructionFiles(
         },
       ],
     })
-
-    fromDecodedMethod.addStatements([
-      `return new ${cls.getName()}({${argsInterface ? "args," : "args: null,"}${
-        accountsInterface ? "accounts," : "accounts: null,"
-      }})`,
-    ])
 
     // build
     const buildMethod = cls.addMethod({

@@ -61,6 +61,13 @@ export class SetupGame {
     return new SetupGame({ args, accounts })
   }
 
+  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): SetupGame {
+    return SetupGame.fromDecoded(
+      layout.decode(ixData, SetupGame.identifier.length),
+      flattenedAccounts
+    )
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

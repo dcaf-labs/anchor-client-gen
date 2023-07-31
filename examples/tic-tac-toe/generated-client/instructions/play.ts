@@ -55,6 +55,13 @@ export class Play {
     return new Play({ args, accounts })
   }
 
+  static decode(ixData: Uint8Array, flattenedAccounts: PublicKey[]): Play {
+    return Play.fromDecoded(
+      layout.decode(ixData, Play.identifier.length),
+      flattenedAccounts
+    )
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

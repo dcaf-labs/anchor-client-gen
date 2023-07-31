@@ -31,6 +31,10 @@ export class CauseError {
     return new CauseError({ args: null, accounts: null })
   }
 
+  static decode(): CauseError {
+    return CauseError.fromDecoded()
+  }
+
   toAccountMetas(): AccountMeta[] {
     return []
   }

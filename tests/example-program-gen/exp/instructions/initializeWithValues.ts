@@ -155,6 +155,16 @@ export class InitializeWithValues {
     return new InitializeWithValues({ args, accounts })
   }
 
+  static decode(
+    ixData: Uint8Array,
+    flattenedAccounts: PublicKey[]
+  ): InitializeWithValues {
+    return InitializeWithValues.fromDecoded(
+      layout.decode(ixData, InitializeWithValues.identifier.length),
+      flattenedAccounts
+    )
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

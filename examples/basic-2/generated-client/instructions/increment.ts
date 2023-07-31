@@ -44,6 +44,10 @@ export class Increment {
     return new Increment({ args: null, accounts })
   }
 
+  static decode(flattenedAccounts: PublicKey[]): Increment {
+    return Increment.fromDecoded(flattenedAccounts)
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {

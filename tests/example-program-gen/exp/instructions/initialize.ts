@@ -64,6 +64,10 @@ export class Initialize {
     return new Initialize({ args: null, accounts })
   }
 
+  static decode(flattenedAccounts: PublicKey[]): Initialize {
+    return Initialize.fromDecoded(flattenedAccounts)
+  }
+
   toAccountMetas(): AccountMeta[] {
     return [
       {
