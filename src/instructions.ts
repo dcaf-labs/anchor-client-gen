@@ -2,7 +2,6 @@ import { Idl } from "@coral-xyz/anchor"
 import {
   CodeBlockWriter,
   InterfaceDeclaration,
-  MethodDeclaration,
   Project,
   VariableDeclarationKind,
 } from "ts-morph"
