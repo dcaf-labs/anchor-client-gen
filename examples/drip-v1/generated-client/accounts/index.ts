@@ -19,43 +19,38 @@ export type { VaultAccount, VaultAccountJSON } from "./Vault"
 export { NoData } from "./NoData"
 export type { NoDataAccount, NoDataAccountJSON } from "./NoData"
 
-export interface AccountHandler {
-  positionAccountHandler(account: Position): Promise<void>
-  vaultPeriodAccountHandler(account: VaultPeriod): Promise<void>
-  vaultProtoConfigAccountHandler(account: VaultProtoConfig): Promise<void>
-  vaultAccountHandler(account: Vault): Promise<void>
-  noDataAccountHandler(account: NoData): Promise<void>
+export interface AccountHandler<T> {
+  positionAccountHandler(account: Position): Promise<T>
+  vaultPeriodAccountHandler(account: VaultPeriod): Promise<T>
+  vaultProtoConfigAccountHandler(account: VaultProtoConfig): Promise<T>
+  vaultAccountHandler(account: Vault): Promise<T>
+  noDataAccountHandler(account: NoData): Promise<T>
 }
 
-export async function processAccount(
+export async function processAccount<T>(
   accountData: Uint8Array,
-  accountHandler: AccountHandler
-): Promise<boolean> {
+  accountHandler: AccountHandler<T>
+): Promise<T | undefined> {
   const accountDataBuff = Buffer.from(accountData)
   if (Position.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = Position.decode(accountDataBuff)
-    await accountHandler.positionAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.positionAccountHandler(decodedAccount)
   }
   if (VaultPeriod.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = VaultPeriod.decode(accountDataBuff)
-    await accountHandler.vaultPeriodAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.vaultPeriodAccountHandler(decodedAccount)
   }
   if (VaultProtoConfig.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = VaultProtoConfig.decode(accountDataBuff)
-    await accountHandler.vaultProtoConfigAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.vaultProtoConfigAccountHandler(decodedAccount)
   }
   if (Vault.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = Vault.decode(accountDataBuff)
-    await accountHandler.vaultAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.vaultAccountHandler(decodedAccount)
   }
   if (NoData.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = NoData.decode(accountDataBuff)
-    await accountHandler.noDataAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.noDataAccountHandler(decodedAccount)
   }
-  return false
+  return undefined
 }

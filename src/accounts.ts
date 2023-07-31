@@ -60,7 +60,7 @@ function genIndexFile(
   if (idl.accounts?.length ?? 0 > 0) {
     const accountHandlerType = src.addInterface({
       isExported: true,
-      name: "AccountHandler",
+      name: "AccountHandler<T>",
     })
     idl.accounts?.forEach((account) => {
       const accountHandler = accountHandlerType.addMethod({
@@ -71,13 +71,13 @@ function genIndexFile(
             type: account.name,
           },
         ],
-        returnType: "Promise<void>",
+        returnType: "Promise<T>",
       })
     })
     const processAccount = src.addFunction({
       isAsync: true,
       isExported: true,
-      name: "processAccount",
+      name: "processAccount<T>",
       parameters: [
         {
           name: "accountData",
@@ -85,10 +85,10 @@ function genIndexFile(
         },
         {
           name: "accountHandler",
-          type: accountHandlerType.getName(),
+          type: `${accountHandlerType.getName()}<T>`,
         },
       ],
-      returnType: "Promise<boolean>",
+      returnType: "Promise<T | undefined>",
     })
     processAccount.addStatements((writer) => {
       writer.writeLine("const accountDataBuff = Buffer.from(accountData)")
@@ -103,16 +103,15 @@ function genIndexFile(
             `const decodedAccount = ${account.name}.decode(accountDataBuff)`
           )
           writer.writeLine(
-            `await accountHandler.${camelcase(
+            `return await accountHandler.${camelcase(
               account.name
             )}AccountHandler(decodedAccount)`
           )
-          writer.write("return true")
         })
       })
     })
     processAccount.addStatements((writer) => {
-      writer.writeLine("return false")
+      writer.writeLine("return undefined")
     })
   }
 }

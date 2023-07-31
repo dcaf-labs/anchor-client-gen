@@ -13,27 +13,25 @@ export enum TicTacToeInstructionNames {
   play = "play",
 }
 
-export interface InstructionHandler {
-  setupGameIxHandler(ix: SetupGame): Promise<void>
-  playIxHandler(ix: Play): Promise<void>
+export interface InstructionHandler<T> {
+  setupGameIxHandler(ix: SetupGame): Promise<T>
+  playIxHandler(ix: Play): Promise<T>
 }
 
-export async function processInstruction(
+export async function processInstruction<T>(
   programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
-  instructionHandler: InstructionHandler
-): Promise<boolean> {
+  instructionHandler: InstructionHandler<T>
+): Promise<T | undefined> {
   const ixDataBuff = Buffer.from(ixData)
   if (SetupGame.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = SetupGame.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.setupGameIxHandler(decodedIx)
-    return true
+    return await instructionHandler.setupGameIxHandler(decodedIx)
   }
   if (Play.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Play.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.playIxHandler(decodedIx)
-    return true
+    return await instructionHandler.playIxHandler(decodedIx)
   }
-  return false
+  return undefined
 }

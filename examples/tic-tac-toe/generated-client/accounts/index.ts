@@ -4,19 +4,18 @@ import { Game } from "./Game"
 export { Game } from "./Game"
 export type { GameAccount, GameAccountJSON } from "./Game"
 
-export interface AccountHandler {
-  gameAccountHandler(account: Game): Promise<void>
+export interface AccountHandler<T> {
+  gameAccountHandler(account: Game): Promise<T>
 }
 
-export async function processAccount(
+export async function processAccount<T>(
   accountData: Uint8Array,
-  accountHandler: AccountHandler
-): Promise<boolean> {
+  accountHandler: AccountHandler<T>
+): Promise<T | undefined> {
   const accountDataBuff = Buffer.from(accountData)
   if (Game.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = Game.decode(accountDataBuff)
-    await accountHandler.gameAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.gameAccountHandler(decodedAccount)
   }
-  return false
+  return undefined
 }

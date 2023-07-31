@@ -61,26 +61,26 @@ export enum DripInstructionNames {
   withdrawA = "withdrawA",
 }
 
-export interface InstructionHandler {
-  initVaultProtoConfigIxHandler(ix: InitVaultProtoConfig): Promise<void>
-  initVaultPeriodIxHandler(ix: InitVaultPeriod): Promise<void>
-  depositIxHandler(ix: Deposit): Promise<void>
-  depositWithMetadataIxHandler(ix: DepositWithMetadata): Promise<void>
-  dripSplTokenSwapIxHandler(ix: DripSplTokenSwap): Promise<void>
-  dripOrcaWhirlpoolIxHandler(ix: DripOrcaWhirlpool): Promise<void>
-  withdrawBIxHandler(ix: WithdrawB): Promise<void>
-  closePositionIxHandler(ix: ClosePosition): Promise<void>
-  initVaultIxHandler(ix: InitVault): Promise<void>
-  setVaultSwapWhitelistIxHandler(ix: SetVaultSwapWhitelist): Promise<void>
-  withdrawAIxHandler(ix: WithdrawA): Promise<void>
+export interface InstructionHandler<T> {
+  initVaultProtoConfigIxHandler(ix: InitVaultProtoConfig): Promise<T>
+  initVaultPeriodIxHandler(ix: InitVaultPeriod): Promise<T>
+  depositIxHandler(ix: Deposit): Promise<T>
+  depositWithMetadataIxHandler(ix: DepositWithMetadata): Promise<T>
+  dripSplTokenSwapIxHandler(ix: DripSplTokenSwap): Promise<T>
+  dripOrcaWhirlpoolIxHandler(ix: DripOrcaWhirlpool): Promise<T>
+  withdrawBIxHandler(ix: WithdrawB): Promise<T>
+  closePositionIxHandler(ix: ClosePosition): Promise<T>
+  initVaultIxHandler(ix: InitVault): Promise<T>
+  setVaultSwapWhitelistIxHandler(ix: SetVaultSwapWhitelist): Promise<T>
+  withdrawAIxHandler(ix: WithdrawA): Promise<T>
 }
 
-export async function processInstruction(
+export async function processInstruction<T>(
   programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
-  instructionHandler: InstructionHandler
-): Promise<boolean> {
+  instructionHandler: InstructionHandler<T>
+): Promise<T | undefined> {
   const ixDataBuff = Buffer.from(ixData)
   if (InitVaultProtoConfig.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = InitVaultProtoConfig.decode(
@@ -88,18 +88,15 @@ export async function processInstruction(
       ixDataBuff,
       accounts
     )
-    await instructionHandler.initVaultProtoConfigIxHandler(decodedIx)
-    return true
+    return await instructionHandler.initVaultProtoConfigIxHandler(decodedIx)
   }
   if (InitVaultPeriod.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = InitVaultPeriod.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.initVaultPeriodIxHandler(decodedIx)
-    return true
+    return await instructionHandler.initVaultPeriodIxHandler(decodedIx)
   }
   if (Deposit.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Deposit.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.depositIxHandler(decodedIx)
-    return true
+    return await instructionHandler.depositIxHandler(decodedIx)
   }
   if (DepositWithMetadata.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = DepositWithMetadata.decode(
@@ -107,33 +104,27 @@ export async function processInstruction(
       ixDataBuff,
       accounts
     )
-    await instructionHandler.depositWithMetadataIxHandler(decodedIx)
-    return true
+    return await instructionHandler.depositWithMetadataIxHandler(decodedIx)
   }
   if (DripSplTokenSwap.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = DripSplTokenSwap.decode(programId, accounts)
-    await instructionHandler.dripSplTokenSwapIxHandler(decodedIx)
-    return true
+    return await instructionHandler.dripSplTokenSwapIxHandler(decodedIx)
   }
   if (DripOrcaWhirlpool.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = DripOrcaWhirlpool.decode(programId, accounts)
-    await instructionHandler.dripOrcaWhirlpoolIxHandler(decodedIx)
-    return true
+    return await instructionHandler.dripOrcaWhirlpoolIxHandler(decodedIx)
   }
   if (WithdrawB.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = WithdrawB.decode(programId, accounts)
-    await instructionHandler.withdrawBIxHandler(decodedIx)
-    return true
+    return await instructionHandler.withdrawBIxHandler(decodedIx)
   }
   if (ClosePosition.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = ClosePosition.decode(programId, accounts)
-    await instructionHandler.closePositionIxHandler(decodedIx)
-    return true
+    return await instructionHandler.closePositionIxHandler(decodedIx)
   }
   if (InitVault.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = InitVault.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.initVaultIxHandler(decodedIx)
-    return true
+    return await instructionHandler.initVaultIxHandler(decodedIx)
   }
   if (SetVaultSwapWhitelist.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = SetVaultSwapWhitelist.decode(
@@ -141,13 +132,11 @@ export async function processInstruction(
       ixDataBuff,
       accounts
     )
-    await instructionHandler.setVaultSwapWhitelistIxHandler(decodedIx)
-    return true
+    return await instructionHandler.setVaultSwapWhitelistIxHandler(decodedIx)
   }
   if (WithdrawA.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = WithdrawA.decode(programId, accounts)
-    await instructionHandler.withdrawAIxHandler(decodedIx)
-    return true
+    return await instructionHandler.withdrawAIxHandler(decodedIx)
   }
-  return false
+  return undefined
 }

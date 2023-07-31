@@ -7,25 +7,23 @@ export type { StateAccount, StateAccountJSON } from "./State"
 export { State2 } from "./State2"
 export type { State2Account, State2AccountJSON } from "./State2"
 
-export interface AccountHandler {
-  stateAccountHandler(account: State): Promise<void>
-  state2AccountHandler(account: State2): Promise<void>
+export interface AccountHandler<T> {
+  stateAccountHandler(account: State): Promise<T>
+  state2AccountHandler(account: State2): Promise<T>
 }
 
-export async function processAccount(
+export async function processAccount<T>(
   accountData: Uint8Array,
-  accountHandler: AccountHandler
-): Promise<boolean> {
+  accountHandler: AccountHandler<T>
+): Promise<T | undefined> {
   const accountDataBuff = Buffer.from(accountData)
   if (State.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = State.decode(accountDataBuff)
-    await accountHandler.stateAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.stateAccountHandler(decodedAccount)
   }
   if (State2.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = State2.decode(accountDataBuff)
-    await accountHandler.state2AccountHandler(decodedAccount)
-    return true
+    return await accountHandler.state2AccountHandler(decodedAccount)
   }
-  return false
+  return undefined
 }

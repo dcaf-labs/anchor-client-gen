@@ -105,7 +105,7 @@ function genIndexFile(
   if (idl.instructions.length > 0) {
     const instructionHandlerType = src.addInterface({
       isExported: true,
-      name: "InstructionHandler",
+      name: "InstructionHandler<T>",
     })
     idl.instructions.forEach((ix) => {
       const handler = instructionHandlerType.addMethod({
@@ -116,13 +116,13 @@ function genIndexFile(
             type: capitalize(ix.name),
           },
         ],
-        returnType: "Promise<void>",
+        returnType: "Promise<T>",
       })
     })
     const processInstruction = src.addFunction({
       isAsync: true,
       isExported: true,
-      name: "processInstruction",
+      name: "processInstruction<T>",
       parameters: [
         {
           name: "programId",
@@ -138,10 +138,10 @@ function genIndexFile(
         },
         {
           name: "instructionHandler",
-          type: instructionHandlerType.getName(),
+          type: `${instructionHandlerType.getName()}<T>`,
         },
       ],
-      returnType: "Promise<boolean>",
+      returnType: "Promise<T | undefined>",
     })
     processInstruction.addStatements((writer) => {
       writer.writeLine("const ixDataBuff = Buffer.from(ixData)")
@@ -159,13 +159,14 @@ function genIndexFile(
           writer.conditionalWrite(ix.accounts.length > 0, "accounts")
           writer.write(")")
           writer.writeLine(
-            `await instructionHandler.${camelcase(ix.name)}IxHandler(decodedIx)`
+            `return await instructionHandler.${camelcase(
+              ix.name
+            )}IxHandler(decodedIx)`
           )
-          writer.writeLine("return true")
         })
       })
     })
-    processInstruction.addStatements(["return false"])
+    processInstruction.addStatements(["return undefined"])
   }
 }
 

@@ -4,19 +4,18 @@ import { Counter } from "./Counter"
 export { Counter } from "./Counter"
 export type { CounterAccount, CounterAccountJSON } from "./Counter"
 
-export interface AccountHandler {
-  counterAccountHandler(account: Counter): Promise<void>
+export interface AccountHandler<T> {
+  counterAccountHandler(account: Counter): Promise<T>
 }
 
-export async function processAccount(
+export async function processAccount<T>(
   accountData: Uint8Array,
-  accountHandler: AccountHandler
-): Promise<boolean> {
+  accountHandler: AccountHandler<T>
+): Promise<T | undefined> {
   const accountDataBuff = Buffer.from(accountData)
   if (Counter.isDiscriminatorEqual(accountDataBuff)) {
     const decodedAccount = Counter.decode(accountDataBuff)
-    await accountHandler.counterAccountHandler(decodedAccount)
-    return true
+    return await accountHandler.counterAccountHandler(decodedAccount)
   }
-  return false
+  return undefined
 }

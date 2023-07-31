@@ -13,27 +13,25 @@ export enum Basic2InstructionNames {
   increment = "increment",
 }
 
-export interface InstructionHandler {
-  createIxHandler(ix: Create): Promise<void>
-  incrementIxHandler(ix: Increment): Promise<void>
+export interface InstructionHandler<T> {
+  createIxHandler(ix: Create): Promise<T>
+  incrementIxHandler(ix: Increment): Promise<T>
 }
 
-export async function processInstruction(
+export async function processInstruction<T>(
   programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
-  instructionHandler: InstructionHandler
-): Promise<boolean> {
+  instructionHandler: InstructionHandler<T>
+): Promise<T | undefined> {
   const ixDataBuff = Buffer.from(ixData)
   if (Create.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Create.decode(programId, ixDataBuff, accounts)
-    await instructionHandler.createIxHandler(decodedIx)
-    return true
+    return await instructionHandler.createIxHandler(decodedIx)
   }
   if (Increment.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Increment.decode(programId, accounts)
-    await instructionHandler.incrementIxHandler(decodedIx)
-    return true
+    return await instructionHandler.incrementIxHandler(decodedIx)
   }
-  return false
+  return undefined
 }

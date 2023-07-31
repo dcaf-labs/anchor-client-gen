@@ -26,24 +26,23 @@ export enum ExampleProgramInstructionNames {
   causeError = "causeError",
 }
 
-export interface InstructionHandler {
-  initializeIxHandler(ix: Initialize): Promise<void>
-  initializeWithValuesIxHandler(ix: InitializeWithValues): Promise<void>
-  initializeWithValues2IxHandler(ix: InitializeWithValues2): Promise<void>
-  causeErrorIxHandler(ix: CauseError): Promise<void>
+export interface InstructionHandler<T> {
+  initializeIxHandler(ix: Initialize): Promise<T>
+  initializeWithValuesIxHandler(ix: InitializeWithValues): Promise<T>
+  initializeWithValues2IxHandler(ix: InitializeWithValues2): Promise<T>
+  causeErrorIxHandler(ix: CauseError): Promise<T>
 }
 
-export async function processInstruction(
+export async function processInstruction<T>(
   programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
-  instructionHandler: InstructionHandler
-): Promise<boolean> {
+  instructionHandler: InstructionHandler<T>
+): Promise<T | undefined> {
   const ixDataBuff = Buffer.from(ixData)
   if (Initialize.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = Initialize.decode(programId, accounts)
-    await instructionHandler.initializeIxHandler(decodedIx)
-    return true
+    return await instructionHandler.initializeIxHandler(decodedIx)
   }
   if (InitializeWithValues.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = InitializeWithValues.decode(
@@ -51,8 +50,7 @@ export async function processInstruction(
       ixDataBuff,
       accounts
     )
-    await instructionHandler.initializeWithValuesIxHandler(decodedIx)
-    return true
+    return await instructionHandler.initializeWithValuesIxHandler(decodedIx)
   }
   if (InitializeWithValues2.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = InitializeWithValues2.decode(
@@ -60,13 +58,11 @@ export async function processInstruction(
       ixDataBuff,
       accounts
     )
-    await instructionHandler.initializeWithValues2IxHandler(decodedIx)
-    return true
+    return await instructionHandler.initializeWithValues2IxHandler(decodedIx)
   }
   if (CauseError.isIdentifierEqual(ixDataBuff)) {
     const decodedIx = CauseError.decode(programId)
-    await instructionHandler.causeErrorIxHandler(decodedIx)
-    return true
+    return await instructionHandler.causeErrorIxHandler(decodedIx)
   }
-  return false
+  return undefined
 }
