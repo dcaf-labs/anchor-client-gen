@@ -19,18 +19,19 @@ export interface InstructionHandler {
 }
 
 export async function processInstruction(
+  programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
 ): Promise<boolean> {
   const ixDataBuff = Buffer.from(ixData)
   if (SetupGame.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = SetupGame.decode(ixDataBuff, accounts)
+    const decodedIx = SetupGame.decode(programId, ixDataBuff, accounts)
     await instructionHandler.setupGameIxHandler(decodedIx)
     return true
   }
   if (Play.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = Play.decode(ixDataBuff, accounts)
+    const decodedIx = Play.decode(programId, ixDataBuff, accounts)
     await instructionHandler.playIxHandler(decodedIx)
     return true
   }

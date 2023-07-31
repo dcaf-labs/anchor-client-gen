@@ -76,63 +76,76 @@ export interface InstructionHandler {
 }
 
 export async function processInstruction(
+  programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
 ): Promise<boolean> {
   const ixDataBuff = Buffer.from(ixData)
   if (InitVaultProtoConfig.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = InitVaultProtoConfig.decode(ixDataBuff, accounts)
+    const decodedIx = InitVaultProtoConfig.decode(
+      programId,
+      ixDataBuff,
+      accounts
+    )
     await instructionHandler.initVaultProtoConfigIxHandler(decodedIx)
     return true
   }
   if (InitVaultPeriod.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = InitVaultPeriod.decode(ixDataBuff, accounts)
+    const decodedIx = InitVaultPeriod.decode(programId, ixDataBuff, accounts)
     await instructionHandler.initVaultPeriodIxHandler(decodedIx)
     return true
   }
   if (Deposit.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = Deposit.decode(ixDataBuff, accounts)
+    const decodedIx = Deposit.decode(programId, ixDataBuff, accounts)
     await instructionHandler.depositIxHandler(decodedIx)
     return true
   }
   if (DepositWithMetadata.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = DepositWithMetadata.decode(ixDataBuff, accounts)
+    const decodedIx = DepositWithMetadata.decode(
+      programId,
+      ixDataBuff,
+      accounts
+    )
     await instructionHandler.depositWithMetadataIxHandler(decodedIx)
     return true
   }
   if (DripSplTokenSwap.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = DripSplTokenSwap.decode(accounts)
+    const decodedIx = DripSplTokenSwap.decode(programId, accounts)
     await instructionHandler.dripSplTokenSwapIxHandler(decodedIx)
     return true
   }
   if (DripOrcaWhirlpool.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = DripOrcaWhirlpool.decode(accounts)
+    const decodedIx = DripOrcaWhirlpool.decode(programId, accounts)
     await instructionHandler.dripOrcaWhirlpoolIxHandler(decodedIx)
     return true
   }
   if (WithdrawB.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = WithdrawB.decode(accounts)
+    const decodedIx = WithdrawB.decode(programId, accounts)
     await instructionHandler.withdrawBIxHandler(decodedIx)
     return true
   }
   if (ClosePosition.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = ClosePosition.decode(accounts)
+    const decodedIx = ClosePosition.decode(programId, accounts)
     await instructionHandler.closePositionIxHandler(decodedIx)
     return true
   }
   if (InitVault.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = InitVault.decode(ixDataBuff, accounts)
+    const decodedIx = InitVault.decode(programId, ixDataBuff, accounts)
     await instructionHandler.initVaultIxHandler(decodedIx)
     return true
   }
   if (SetVaultSwapWhitelist.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = SetVaultSwapWhitelist.decode(ixDataBuff, accounts)
+    const decodedIx = SetVaultSwapWhitelist.decode(
+      programId,
+      ixDataBuff,
+      accounts
+    )
     await instructionHandler.setVaultSwapWhitelistIxHandler(decodedIx)
     return true
   }
   if (WithdrawA.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = WithdrawA.decode(accounts)
+    const decodedIx = WithdrawA.decode(programId, accounts)
     await instructionHandler.withdrawAIxHandler(decodedIx)
     return true
   }

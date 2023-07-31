@@ -34,28 +34,37 @@ export interface InstructionHandler {
 }
 
 export async function processInstruction(
+  programId: PublicKey,
   ixData: Uint8Array,
   accounts: PublicKey[],
   instructionHandler: InstructionHandler
 ): Promise<boolean> {
   const ixDataBuff = Buffer.from(ixData)
   if (Initialize.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = Initialize.decode(accounts)
+    const decodedIx = Initialize.decode(programId, accounts)
     await instructionHandler.initializeIxHandler(decodedIx)
     return true
   }
   if (InitializeWithValues.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = InitializeWithValues.decode(ixDataBuff, accounts)
+    const decodedIx = InitializeWithValues.decode(
+      programId,
+      ixDataBuff,
+      accounts
+    )
     await instructionHandler.initializeWithValuesIxHandler(decodedIx)
     return true
   }
   if (InitializeWithValues2.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = InitializeWithValues2.decode(ixDataBuff, accounts)
+    const decodedIx = InitializeWithValues2.decode(
+      programId,
+      ixDataBuff,
+      accounts
+    )
     await instructionHandler.initializeWithValues2IxHandler(decodedIx)
     return true
   }
   if (CauseError.isIdentifierEqual(ixDataBuff)) {
-    const decodedIx = CauseError.decode()
+    const decodedIx = CauseError.decode(programId)
     await instructionHandler.causeErrorIxHandler(decodedIx)
     return true
   }

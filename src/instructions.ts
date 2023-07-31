@@ -125,6 +125,10 @@ function genIndexFile(
       name: "processInstruction",
       parameters: [
         {
+          name: "programId",
+          type: "PublicKey",
+        },
+        {
           name: "ixData",
           type: "Uint8Array",
         },
@@ -148,7 +152,9 @@ function genIndexFile(
           `if (${capitalize(ix.name)}.isIdentifierEqual(ixDataBuff))`
         )
         writer.block(() => {
-          writer.write(`const decodedIx = ${capitalize(ix.name)}.decode(`)
+          writer.write(
+            `const decodedIx = ${capitalize(ix.name)}.decode(programId,`
+          )
           writer.conditionalWrite(ix.args.length > 0, "ixDataBuff,")
           writer.conditionalWrite(ix.accounts.length > 0, "accounts")
           writer.write(")")
