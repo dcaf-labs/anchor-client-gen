@@ -2,6 +2,7 @@ import { Idl } from "@coral-xyz/anchor"
 import {
   CodeBlockWriter,
   InterfaceDeclaration,
+  MethodDeclaration,
   Project,
   VariableDeclarationKind,
 } from "ts-morph"
@@ -57,9 +58,17 @@ function genIndexFile(
   })
   src.addStatements([
     `// This file was automatically generated. DO NOT MODIFY DIRECTLY.`,
+    `import { PublicKey } from "@solana/web3.js"`,
   ])
-
   idl.instructions.forEach((ix) => {
+    src.addImportDeclaration({
+      namedImports: [
+        {
+          name: capitalize(ix.name),
+        },
+      ],
+      moduleSpecifier: `./${ix.name}`,
+    })
     src.addExportDeclaration({
       moduleSpecifier: `./${ix.name}`,
     })
@@ -91,6 +100,64 @@ function genIndexFile(
         initializer: `"${ix.name}"`,
       })
     }
+  }
+
+  if (idl.instructions.length > 0) {
+    const instructionHandlerType = src.addInterface({
+      isExported: true,
+      name: "InstructionHandler",
+    })
+    idl.instructions.forEach((ix) => {
+      const handler = instructionHandlerType.addMethod({
+        name: `${camelcase(ix.name)}IxHandler`,
+        parameters: [
+          {
+            name: "ix",
+            type: capitalize(ix.name),
+          },
+        ],
+        returnType: "Promise<void>",
+      })
+    })
+    const processInstruction = src.addFunction({
+      isAsync: true,
+      isExported: true,
+      name: "processInstruction",
+      parameters: [
+        {
+          name: "ixData",
+          type: "Uint8Array",
+        },
+        {
+          name: "accounts",
+          type: "PublicKey[]",
+        },
+        {
+          name: "instructionHandler",
+          type: instructionHandlerType.getName(),
+        },
+      ],
+      returnType: "Promise<void>",
+    })
+    processInstruction.addStatements((writer) => {
+      writer.writeLine("const identifier = Buffer.from(ixData.slice(0,8))")
+    })
+    idl.instructions.forEach((ix) => {
+      processInstruction.addStatements((writer) => {
+        writer.write(
+          `if (${capitalize(ix.name)}.isIdentifierEqual(identifier))`
+        )
+        writer.block(() => {
+          writer.write(`const decodedIx = ${capitalize(ix.name)}.decode(`)
+          writer.conditionalWrite(ix.args.length > 0, "ixData,")
+          writer.conditionalWrite(ix.accounts.length > 0, "accounts")
+          writer.write(")")
+          writer.writeLine(
+            `await instructionHandler.${camelcase(ix.name)}IxHandler(decodedIx)`
+          )
+        })
+      })
+    })
   }
 }
 
