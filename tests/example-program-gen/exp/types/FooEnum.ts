@@ -1,6 +1,7 @@
 // This file was automatically generated. DO NOT MODIFY DIRECTLY.
 /* eslint-disable */
 import { PublicKey } from "@solana/web3.js"
+import BN from "bn.js"
 import * as types from "../types"
 import * as borsh from "@coral-xyz/borsh"
 
@@ -242,14 +243,84 @@ export class VecStruct {
   }
 }
 
+export type WithU64Fields = [bigint]
+export type WithU64Value = [bigint]
+
+export interface WithU64JSON {
+  kind: "WithU64"
+  value: [string]
+}
+
+export class WithU64 {
+  static readonly discriminator = 6
+  static readonly kind = "WithU64"
+  readonly discriminator = 6
+  readonly kind = "WithU64"
+  readonly value: WithU64Value
+
+  constructor(value: WithU64Fields) {
+    this.value = [value[0]]
+  }
+
+  toJSON(): WithU64JSON {
+    return {
+      kind: "WithU64",
+      value: [this.value[0].toString()],
+    }
+  }
+
+  toEncodable() {
+    return {
+      WithU64: {
+        _0: new BN(this.value[0].toString()),
+      },
+    }
+  }
+}
+
+export type WithU128Fields = [bigint]
+export type WithU128Value = [bigint]
+
+export interface WithU128JSON {
+  kind: "WithU128"
+  value: [string]
+}
+
+export class WithU128 {
+  static readonly discriminator = 7
+  static readonly kind = "WithU128"
+  readonly discriminator = 7
+  readonly kind = "WithU128"
+  readonly value: WithU128Value
+
+  constructor(value: WithU128Fields) {
+    this.value = [value[0]]
+  }
+
+  toJSON(): WithU128JSON {
+    return {
+      kind: "WithU128",
+      value: [this.value[0].toString()],
+    }
+  }
+
+  toEncodable() {
+    return {
+      WithU128: {
+        _0: new BN(this.value[0].toString()),
+      },
+    }
+  }
+}
+
 export interface NoFieldsJSON {
   kind: "NoFields"
 }
 
 export class NoFields {
-  static readonly discriminator = 6
+  static readonly discriminator = 8
   static readonly kind = "NoFields"
-  readonly discriminator = 6
+  readonly discriminator = 8
   readonly kind = "NoFields"
 
   toJSON(): NoFieldsJSON {
@@ -306,6 +377,14 @@ export function fromDecoded(obj: any): types.FooEnumKind {
       val["_0"].map((item: any) => types.BarStruct.fromDecoded(item)),
     ])
   }
+  if ("WithU64" in obj) {
+    const val = obj["WithU64"]
+    return new WithU64([val["_0"]])
+  }
+  if ("WithU128" in obj) {
+    const val = obj["WithU128"]
+    return new WithU128([val["_0"]])
+  }
   if ("NoFields" in obj) {
     return new NoFields()
   }
@@ -345,6 +424,12 @@ export function fromJSON(obj: types.FooEnumJSON): types.FooEnumKind {
         obj.value[0].map((item) => types.BarStruct.fromJSON(item)),
       ])
     }
+    case "WithU64": {
+      return new WithU64([BigInt(obj.value[0])])
+    }
+    case "WithU128": {
+      return new WithU128([BigInt(obj.value[0])])
+    }
     case "NoFields": {
       return new NoFields()
     }
@@ -372,6 +457,8 @@ export function layout(property?: string) {
       "OptionStruct"
     ),
     borsh.struct([borsh.vec(types.BarStruct.layout(), "_0")], "VecStruct"),
+    borsh.struct([borsh.u64("_0")], "WithU64"),
+    borsh.struct([borsh.u128("_0")], "WithU128"),
     borsh.struct([], "NoFields"),
   ])
   if (property !== undefined) {

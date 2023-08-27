@@ -106,6 +106,8 @@ pub enum FooEnum {
     Struct(BarStruct),
     OptionStruct(Option<BarStruct>),
     VecStruct(Vec<BarStruct>),
+    WithU64(u64),
+    WithU128(u128),
     NoFields,
 }
 

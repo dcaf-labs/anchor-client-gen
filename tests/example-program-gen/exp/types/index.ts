@@ -15,6 +15,8 @@ export type FooEnumKind =
   | FooEnum.Struct
   | FooEnum.OptionStruct
   | FooEnum.VecStruct
+  | FooEnum.WithU64
+  | FooEnum.WithU128
   | FooEnum.NoFields
 export type FooEnumJSON =
   | FooEnum.UnnamedJSON
@@ -23,4 +25,6 @@ export type FooEnumJSON =
   | FooEnum.StructJSON
   | FooEnum.OptionStructJSON
   | FooEnum.VecStructJSON
+  | FooEnum.WithU64JSON
+  | FooEnum.WithU128JSON
   | FooEnum.NoFieldsJSON
