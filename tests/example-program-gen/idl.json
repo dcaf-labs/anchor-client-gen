@@ -571,6 +571,18 @@
             ]
           },
           {
+            "name": "WithU64",
+            "fields": [
+              "u64"
+            ]
+          },
+          {
+            "name": "WithU128",
+            "fields": [
+              "u128"
+            ]
+          },
+          {
             "name": "NoFields"
           }
         ]

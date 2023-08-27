@@ -326,6 +326,7 @@ function genEnum(
   src.addStatements([
     `/* eslint-disable */`,
     `import { PublicKey } from "@solana/web3.js"`,
+    `import BN from "bn.js"`,
     `import * as types from "../types"`,
     `import * as borsh from "@coral-xyz/borsh"`,
   ])

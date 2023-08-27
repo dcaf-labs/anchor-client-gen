@@ -741,8 +741,8 @@ it("toJSON", async () => {
     expect(act.optionNested?.otherField).toBe(exp.optionNested?.otherField)
 
     if (
-      act.enumField.discriminator !== 6 ||
-      exp.enumField.discriminator !== 6
+      act.enumField.discriminator !== 8 ||
+      exp.enumField.discriminator !== 8
     ) {
       throw new Error()
     }
@@ -768,8 +768,8 @@ it("toJSON", async () => {
     expect(act.vecNested[0].otherField).toBe(exp.vecNested[0].otherField)
 
     if (
-      act.enumField.discriminator !== 6 ||
-      exp.enumField.discriminator !== 6
+      act.enumField.discriminator !== 8 ||
+      exp.enumField.discriminator !== 8
     ) {
       throw new Error()
     }
@@ -826,7 +826,7 @@ it("toJSON", async () => {
   // enumField4
   {
     const act = stateFromJSON.data.enumField4
-    if (act.discriminator !== 6) {
+    if (act.discriminator !== 8) {
       throw new Error()
     }
     expect(act.kind).toBe("NoFields")
