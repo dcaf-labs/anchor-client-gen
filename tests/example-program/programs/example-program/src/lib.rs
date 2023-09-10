@@ -11,6 +11,39 @@ pub mod example_program {
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         ctx.accounts.state.set_inner(State::default());
+        emit!(InitializeEvent {
+            bool_field: true,
+            u8_field: 234,
+            i8_field: -123,
+            u16_field: 62345,
+            i16_field: -31234,
+            u32_field: 1234567891,
+            i32_field: -1234567891,
+            f32_field: 123456.5,
+            u64_field: u64::MAX / 2 + 10,
+            i64_field: i64::MIN / 2 - 10,
+            f64_field: 1234567891.345,
+            u128_field: u128::MAX / 2 + 10,
+            i128_field: i128::MIN / 2 - 10,
+            bytes_field: vec![1, 2, 255, 254],
+            string_field: String::from("hello"),
+            pubkey_field: Pubkey::from_str("EPZP2wrcRtMxrAPJCXVEQaYD9eH7fH7h12YqKDcd4aS7").unwrap(),
+            vec_field: vec![1, 2, 100, 1000, u64::MAX],
+            vec_struct_field: vec![FooStruct::default()],
+            option_field: None,
+            option_struct_field: Some(FooStruct::default()),
+            struct_field: FooStruct::default(),
+            array_field: [true, false, true],
+            enum_field_1: FooEnum::Unnamed(false, 10, BarStruct::default()),
+            enum_field_2: FooEnum::Named {
+                bool_field: true,
+                u8_field: 20,
+                nested: BarStruct::default(),
+            },
+            enum_field_3: FooEnum::Struct(BarStruct::default()),
+            enum_field_4: FooEnum::NoFields,
+            payer: ctx.accounts.payer.key()
+        });
         Ok(())
     }
 
@@ -73,6 +106,40 @@ pub mod example_program {
             enum_field_4,
         });
 
+        emit!(InitializeEvent {
+            bool_field: true,
+            u8_field: 234,
+            i8_field: -123,
+            u16_field: 62345,
+            i16_field: -31234,
+            u32_field: 1234567891,
+            i32_field: -1234567891,
+            f32_field: 123456.5,
+            u64_field: u64::MAX / 2 + 10,
+            i64_field: i64::MIN / 2 - 10,
+            f64_field: 1234567891.345,
+            u128_field: u128::MAX / 2 + 10,
+            i128_field: i128::MIN / 2 - 10,
+            bytes_field: vec![1, 2, 255, 254],
+            string_field: String::from("hello"),
+            pubkey_field: Pubkey::from_str("EPZP2wrcRtMxrAPJCXVEQaYD9eH7fH7h12YqKDcd4aS7").unwrap(),
+            vec_field: vec![1, 2, 100, 1000, u64::MAX],
+            vec_struct_field: vec![FooStruct::default()],
+            option_field: None,
+            option_struct_field: Some(FooStruct::default()),
+            struct_field: FooStruct::default(),
+            array_field: [true, false, true],
+            enum_field_1: FooEnum::Unnamed(false, 10, BarStruct::default()),
+            enum_field_2: FooEnum::Named {
+                bool_field: true,
+                u8_field: 20,
+                nested: BarStruct::default(),
+            },
+            enum_field_3: FooEnum::Struct(BarStruct::default()),
+            enum_field_4: FooEnum::NoFields,
+            payer: ctx.accounts.payer.key()
+        });
+
         Ok(())
     }
 
@@ -83,6 +150,11 @@ pub mod example_program {
         vec_of_option: Vec<Option<u64>>,
     ) -> Result<()> {
         ctx.accounts.state.set_inner(State2 { vec_of_option });
+
+        emit!(Initialize2Event {
+            payer: ctx.accounts.payer.key()
+        });
+
         Ok(())
     }
 
@@ -261,6 +333,37 @@ pub struct Initialize<'info> {
     system_program: Program<'info, System>,
 }
 
+#[event]
+pub struct InitializeEvent {
+    bool_field: bool,
+    u8_field: u8,
+    i8_field: i8,
+    u16_field: u16,
+    i16_field: i16,
+    u32_field: u32,
+    i32_field: i32,
+    f32_field: f32,
+    u64_field: u64,
+    i64_field: i64,
+    f64_field: f64,
+    u128_field: u128,
+    i128_field: i128,
+    bytes_field: Vec<u8>,
+    string_field: String,
+    pubkey_field: Pubkey,
+    vec_field: Vec<u64>,
+    vec_struct_field: Vec<FooStruct>,
+    option_field: Option<bool>,
+    option_struct_field: Option<FooStruct>,
+    struct_field: FooStruct,
+    array_field: [bool; 3],
+    enum_field_1: FooEnum,
+    enum_field_2: FooEnum,
+    enum_field_3: FooEnum,
+    enum_field_4: FooEnum,
+    payer: Pubkey,
+}
+
 #[derive(Accounts)]
 pub struct Initialize2<'info> {
     #[account(
@@ -273,6 +376,11 @@ pub struct Initialize2<'info> {
     #[account(mut)]
     payer: Signer<'info>,
     system_program: Program<'info, System>,
+}
+
+#[event]
+pub struct Initialize2Event {
+    payer: Pubkey,
 }
 
 #[derive(Accounts)]

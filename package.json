@@ -14,10 +14,11 @@
     "build:test-fixture:copy-idl": "cp tests/example-program/target/idl/example_program.json tests/example-program-gen/idl.json",
     "build:test-fixture:generate-exp": "rimraf tests/example-program-gen/exp && node ./dist/main.js tests/example-program-gen/idl.json tests/example-program-gen/exp --program-id 3rTQ3R4B2PxZrAyx7EUefySPgZY8RhJf16cZajbmrzp8",
     "build:example-program": "cd tests/example-program && anchor build",
-    "generate-examples": "rimraf ./examples/**/generated-client && yarn generate-examples:basic-2 && yarn generate-examples:tic-tac-toe && yarn generate-examples:drip-v1",
+    "generate-examples": "rimraf ./examples/**/generated-client && yarn generate-examples:basic-2 && yarn generate-examples:tic-tac-toe && yarn generate-examples:drip-v1 && yarn generate-examples:pad",
     "generate-examples:basic-2": "node ./dist/main.js examples/basic-2/idl.json examples/basic-2/generated-client --program-id Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
     "generate-examples:tic-tac-toe": "node ./dist/main.js examples/tic-tac-toe/idl.json examples/tic-tac-toe/generated-client --program-id Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
     "generate-examples:drip-v1": "node ./dist/main.js examples/drip-v1/idl.json examples/drip-v1/generated-client",
+    "generate-examples:pad": "node ./dist/main.js examples/pre-authorized-debit/idl.json examples/pre-authorized-debit/generated-client",
     "generate-examples:drip-v2": "node ./dist/main.js examples/drip-v2/idl.json examples/drip-v2/generated-client",
     "test": "yarn test:prepare && start-server-and-test test:start-validator http://127.0.0.1:8899/health 'vitest --watch'",
     "test:no-watch": "yarn test:prepare && start-server-and-test test:start-validator http://127.0.0.1:8899/health 'vitest'",
@@ -54,7 +55,8 @@
     "js-sha256": "^0.9.0",
     "prettier": "^2.8.8",
     "snake-case": "^3.0.4",
-    "ts-morph": "^18.0.0"
+    "ts-morph": "^18.0.0",
+    "base64-js": "^1.5.1"
   },
   "files": [
     "dist"
