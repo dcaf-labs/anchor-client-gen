@@ -589,6 +589,185 @@
       }
     }
   ],
+  "events": [
+    {
+      "name": "InitializeEvent",
+      "fields": [
+        {
+          "name": "boolField",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "u8Field",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "i8Field",
+          "type": "i8",
+          "index": false
+        },
+        {
+          "name": "u16Field",
+          "type": "u16",
+          "index": false
+        },
+        {
+          "name": "i16Field",
+          "type": "i16",
+          "index": false
+        },
+        {
+          "name": "u32Field",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "i32Field",
+          "type": "i32",
+          "index": false
+        },
+        {
+          "name": "f32Field",
+          "type": "f32",
+          "index": false
+        },
+        {
+          "name": "u64Field",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "i64Field",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "f64Field",
+          "type": "f64",
+          "index": false
+        },
+        {
+          "name": "u128Field",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "i128Field",
+          "type": "i128",
+          "index": false
+        },
+        {
+          "name": "bytesField",
+          "type": "bytes",
+          "index": false
+        },
+        {
+          "name": "stringField",
+          "type": "string",
+          "index": false
+        },
+        {
+          "name": "pubkeyField",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "vecField",
+          "type": {
+            "vec": "u64"
+          },
+          "index": false
+        },
+        {
+          "name": "vecStructField",
+          "type": {
+            "vec": {
+              "defined": "FooStruct"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "optionField",
+          "type": {
+            "option": "bool"
+          },
+          "index": false
+        },
+        {
+          "name": "optionStructField",
+          "type": {
+            "option": {
+              "defined": "FooStruct"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "structField",
+          "type": {
+            "defined": "FooStruct"
+          },
+          "index": false
+        },
+        {
+          "name": "arrayField",
+          "type": {
+            "array": [
+              "bool",
+              3
+            ]
+          },
+          "index": false
+        },
+        {
+          "name": "enumField1",
+          "type": {
+            "defined": "FooEnum"
+          },
+          "index": false
+        },
+        {
+          "name": "enumField2",
+          "type": {
+            "defined": "FooEnum"
+          },
+          "index": false
+        },
+        {
+          "name": "enumField3",
+          "type": {
+            "defined": "FooEnum"
+          },
+          "index": false
+        },
+        {
+          "name": "enumField4",
+          "type": {
+            "defined": "FooEnum"
+          },
+          "index": false
+        },
+        {
+          "name": "payer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "Initialize2Event",
+      "fields": [
+        {
+          "name": "payer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,

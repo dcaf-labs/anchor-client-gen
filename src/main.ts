@@ -10,6 +10,7 @@ import { genInstructions } from "./instructions"
 import { genTypes } from "./types"
 import { program } from "commander"
 import * as prettier from "prettier"
+import { genEvents } from "./events"
 
 async function main() {
   program
@@ -45,6 +46,8 @@ async function main() {
   genTypes(project, idl, outPath)
   console.log("generating accounts...")
   genAccounts(project, idl, outPath)
+  console.log("generating events...")
+  genEvents(project, idl, outPath)
 
   const files = project.getSourceFiles()
 

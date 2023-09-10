@@ -21,6 +21,10 @@ import { snakeCase } from "snake-case"
 export function unreachable(_: never) {
   return undefined
 }
+export function eventInterfaceName(typeName: string) {
+  return `${typeName}Event`
+}
+
 export function accountInterfaceName(typeName: string) {
   return `${typeName}Account`
 }
@@ -112,7 +116,11 @@ export function tsTypeFromIdl(
       if (isComplexType(ty) && "defined" in ty) {
         const filtered = idl.types?.filter((t) => t.name === ty.defined) ?? []
         if (filtered.length !== 1) {
-          throw new Error(`Defined type not found: ${JSON.stringify(ty)}`)
+          throw new Error(
+            `Defined type not found: ${JSON.stringify(
+              ty
+            )}. This might happen if your event directly uses an account state struct; this is currently not supported!`
+          )
         }
 
         switch (filtered[0].type.kind) {
@@ -225,6 +233,13 @@ export function genIxIdentifier(ixName: string) {
 
   return sha256.digest(preimage).slice(0, 8)
 }
+
+export function genEventDiscriminator(accName: string) {
+  return sha256
+    .digest(`event:${camelcase(accName, { pascalCase: true })}`)
+    .slice(0, 8)
+}
+
 export function genAccDiscriminator(accName: string) {
   return sha256
     .digest(`account:${camelcase(accName, { pascalCase: true })}`)
@@ -298,7 +313,11 @@ export function fieldToEncodable(
         const defined = ty.type.defined
         const filtered = idl.types?.filter((t) => t.name === defined) ?? []
         if (filtered.length !== 1) {
-          throw new Error(`Defined type not found: ${JSON.stringify(ty)}`)
+          throw new Error(
+            `Defined type not found: ${JSON.stringify(
+              ty
+            )}. This might happen if your event directly uses an account state struct; this is currently not supported!`
+          )
         }
 
         switch (filtered[0].type.kind) {
@@ -397,7 +416,11 @@ export function fieldFromDecoded(
         const defined = ty.type.defined
         const filtered = idl.types?.filter((t) => t.name === defined) ?? []
         if (filtered.length !== 1) {
-          throw new Error(`Defined type not found: ${JSON.stringify(ty)}`)
+          throw new Error(
+            `Defined type not found: ${JSON.stringify(
+              ty
+            )}. This might happen if your event directly uses an account state struct; this is currently not supported!`
+          )
         }
 
         switch (filtered[0].type.kind) {
@@ -462,7 +485,9 @@ export function structFieldInitializer(
         const defined = field.type.defined
         const filtered = idl.types?.filter((t) => t.name === defined) ?? []
         if (filtered.length !== 1) {
-          throw new Error(`Defined type not found: ${defined}`)
+          throw new Error(
+            `Defined type not found: ${defined}. This might happen if your event directly uses an account state struct; this is currently not supported!`
+          )
         }
 
         switch (filtered[0].type.kind) {
@@ -613,7 +638,11 @@ export function fieldToJSON(idl: Idl, ty: IdlField, valPrefix = ""): string {
         const defined = ty.type.defined
         const filtered = idl.types?.filter((t) => t.name === defined) ?? []
         if (filtered.length !== 1) {
-          throw new Error(`Defined type not found: ${JSON.stringify(ty)}`)
+          throw new Error(
+            `Defined type not found: ${JSON.stringify(
+              ty
+            )}. This might happen if your event directly uses an account state struct; this is currently not supported!`
+          )
         }
 
         switch (filtered[0].type.kind) {
